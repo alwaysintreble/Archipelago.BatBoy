@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>com.alwaysintreble.Archipelago.BatBoy</AssemblyName>
+    <Description>BatBoy integration for Archipelago</Description>
+    <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <PackageId>com.alwaysintreble.Archipelago.BatBoy</PackageId>
+    <PackageVersion>0.1.0</PackageVersion>
+    <Title>Archipelago.BatBoy</Title>
+    <Authors>alwaysintreble</Authors>
+    <Product>Archipelago.BatBoy</Product>
+    <AssemblyVersion>0.1.0</AssemblyVersion>
+    <FileVersion>0.1.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>E:\Games\SteamLibrary\steamapps\common\Bat Boy Demo\BepInEx\plugins\Archipelago</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Archipelago.MultiClient.Net" Version="4.0.0" />
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+    <PackageReference Include="UnityEngine.Modules" Version="2020.2.2" IncludeAssets="compile" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\lib\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MMHOOK_Assembly-CSharp">
+      <HintPath>..\lib\MMHOOK_Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="XPLUSGames.GameDevBase.Editor">
+      <HintPath>..\lib\XPLUSGames.GameDevBase.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="XPLUSGames.Localization.Runtime">
+      <HintPath>..\lib\XPLUSGames.Localization.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="XPLUSGames.SaveSystem.Editor">
+      <HintPath>..\lib\XPLUSGames.SaveSystem.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="XPLUSGames.SaveSystem.Runtime">
+      <HintPath>..\lib\XPLUSGames.SaveSystem.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="XPLUSGames.Utilities.Editor">
+      <HintPath>..\lib\XPLUSGames.Utilities.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="XPLUSGames.Utilities.Runtime">
+      <HintPath>..\lib\XPLUSGames.Utilities.Runtime.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
