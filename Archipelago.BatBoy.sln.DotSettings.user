@@ -1,0 +1,22 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005CWags_005CRiderProjects_005CArchipelago_002EBatBoy_005Clib_005CAssembly_002DCSharp_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005CWags_005CRiderProjects_005CArchipelago_002EBatBoy_005Clib_005CMMHOOK_005FAssembly_002DCSharp_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005CWags_005CRiderProjects_005CArchipelago_002EBatBoy_005Clib_005CXPLUSGames_002EGameDevBase_002EEditor_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005CWags_005CRiderProjects_005CArchipelago_002EBatBoy_005Clib_005CXPLUSGames_002ELocalization_002ERuntime_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005CWags_005CRiderProjects_005CArchipelago_002EBatBoy_005Clib_005CXPLUSGames_002ESaveSystem_002EEditor_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005CWags_005CRiderProjects_005CArchipelago_002EBatBoy_005Clib_005CXPLUSGames_002ESaveSystem_002ERuntime_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005CWags_005CRiderProjects_005CArchipelago_002EBatBoy_005Clib_005CXPLUSGames_002EUtilities_002EEditor_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005CWags_005CRiderProjects_005CArchipelago_002EBatBoy_005Clib_005CXPLUSGames_002EUtilities_002ERuntime_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ABaseUnityPlugin_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2022_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F6a18188ce6264976a9218286caeb57f41ea00_003Fa4_003Ff656c40e_003FBaseUnityPlugin_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ABatBoySaveGame_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2022_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F1995944e34d545be960182d60816e4c9f2e00_003F7b_003F87a51191_003FBatBoySaveGame_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AShopItem_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2022_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F03eb461a451c49928312ef671a1227ba6f600_003F66_003F683a6453_003FShopItem_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Wags\RiderProjects\Archipelago.BatBoy\lib\Assembly-CSharp.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Wags\RiderProjects\Archipelago.BatBoy\lib\XPLUSGames.SaveSystem.Editor.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Wags\RiderProjects\Archipelago.BatBoy\lib\XPLUSGames.SaveSystem.Runtime.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Wags\RiderProjects\Archipelago.BatBoy\lib\MMHOOK_Assembly-CSharp.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Wags\RiderProjects\Archipelago.BatBoy\lib\XPLUSGames.Utilities.Editor.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Wags\RiderProjects\Archipelago.BatBoy\lib\XPLUSGames.Utilities.Runtime.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Wags\RiderProjects\Archipelago.BatBoy\lib\XPLUSGames.GameDevBase.Editor.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Wags\RiderProjects\Archipelago.BatBoy\lib\XPLUSGames.Localization.Runtime.dll" /&gt;&#xD;
+&lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>
