@@ -1,14 +1,16 @@
 ﻿namespace Archipelago.BatBoy;
 
-public enum Items
+public enum Item
 {
     RedSeed,
     GreenSeed,
     GoldenSeed,
     Casette,
+    Health,
+    Stamina,
 }
 
-public enum Abilities
+public enum Ability
 {
     Batspin,
     SlashBash,
