@@ -39,23 +39,8 @@
     <Reference Include="MMHOOK_Assembly-CSharp">
       <HintPath>..\lib\MMHOOK_Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="XPLUSGames.GameDevBase.Editor">
-      <HintPath>..\lib\XPLUSGames.GameDevBase.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="XPLUSGames.Localization.Runtime">
-      <HintPath>..\lib\XPLUSGames.Localization.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="XPLUSGames.SaveSystem.Editor">
-      <HintPath>..\lib\XPLUSGames.SaveSystem.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="XPLUSGames.SaveSystem.Runtime">
       <HintPath>..\lib\XPLUSGames.SaveSystem.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="XPLUSGames.Utilities.Editor">
-      <HintPath>..\lib\XPLUSGames.Utilities.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="XPLUSGames.Utilities.Runtime">
-      <HintPath>..\lib\XPLUSGames.Utilities.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
