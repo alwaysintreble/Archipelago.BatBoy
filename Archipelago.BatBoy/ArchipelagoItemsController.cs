@@ -61,6 +61,7 @@ public class ArchipelagoItemsController
     
     private void SendLocationCheck(LocationType locationType, Level currentLevel)
     {
+        --currentLevel;
         ArchipelagoClient.CheckLocation(currentLevel, locationType);
         APLog.LogInfo($"{locationType} for {currentLevel} found!");
     }
@@ -96,13 +97,22 @@ public class ArchipelagoItemsController
     // either find a way to skip these tutorials or to do this loop after it
     private void GetCorrectAbilities(BatBoySlot saveSlot)
     {
+        #if DEBUG
+        APLog.LogInfo($"Current abilities: ");
+        foreach (Ability ability in ArchipelagoClient.ServerData.AcquiredAbilities)
+        {
+            APLog.LogInfo(ability);
+        }
+        #endif
         foreach (Ability ability in Enum.GetValues(typeof(Ability)))
         {
-            if (!ArchipelagoClient.acquiredAbilities.Contains(ability))
+            if (!ArchipelagoClient.ServerData.AcquiredAbilities.Contains(ability))
             {
                 FieldInfo abilityField = AbilityMap.AbilityFields[ability];
                 abilityField.SetValue(saveSlot, false);
+                #if DEBUG
                 APLog.LogInfo($"Goodbye Jojo! ({ability})");
+                #endif
             }
         }
     }

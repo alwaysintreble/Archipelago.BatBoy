@@ -45,7 +45,6 @@ public class ArchipelagoClient
     public static bool Silent = false;
     public static State state = State.Menu;
     public static bool Authenticated;
-    public static List<Ability> acquiredAbilities = new List<Ability>();
 
     public static ArchipelagoSession Session;
 
@@ -57,7 +56,7 @@ public class ArchipelagoClient
 
         // add items and abilities to item lookup dictionary
         foreach (Item i in Enum.GetValues(typeof(Item)))
-        { 
+        {
             ItemsLookup[baseCodeOffset + (int)i] = i;
         }
         foreach (Ability i in Enum.GetValues(typeof(Ability)))
@@ -71,7 +70,7 @@ public class ArchipelagoClient
             foreach (LocationType j in Enum.GetValues(typeof(LocationType)))
             {
                 LevelLocationsLookup[new LevelLocation(i, j)] =
-                    baseCodeOffset + ((int)i * 5) + (int)j;
+                    baseCodeOffset + (int)i * 5 + (int)j;
             }
         }
         // only one shop so pseudo hard coding this for now
@@ -302,23 +301,24 @@ public class ArchipelagoClient
             {
                 if (ServerData.Checked.Contains(LevelLocationsLookup[new LevelLocation((Level)i, j)])) 
                     continue;
+                Level currentLevel = (Level)i + 1;
                 switch (j)
                 {
                     case LocationType.RedSeed:
                         if(saveSlot.RedSeedCollectedLevels.Contains(i))
-                            CheckLocation((Level)i, j);
+                            CheckLocation(currentLevel, j);
                         break;
                     case LocationType.GreenSeed:
                         if (saveSlot.GreenSeedCollectedLevels.Contains(i))
-                            CheckLocation((Level)i, j);
+                            CheckLocation(currentLevel, j);
                         break;
                     case LocationType.GoldenSeed:
                         if (saveSlot.GoldenSeedCollectedLevels.Contains(i))
-                            CheckLocation((Level)i, j);
+                            CheckLocation(currentLevel, j);
                         break;
                     case LocationType.LevelClear:
                         if (saveSlot.LevelsClear.Contains(i))
-                            CheckLocation((Level)i, j);
+                            CheckLocation(currentLevel, j);
                         break;
                 }
             }
@@ -333,7 +333,6 @@ public class ArchipelagoClient
     public static void CheckLocation(Level level, LocationType locationType)
     {
         long checkID = LevelLocationsLookup[new LevelLocation(level, locationType)];
-        APLog.LogInfo($"Level {level} location {locationType}");
         Session.Locations.CompleteLocationChecks(checkID);
         ServerData.Checked.Add(checkID);
     }
@@ -341,7 +340,6 @@ public class ArchipelagoClient
     public static void CheckLocation(ShopSlots slot)
     {
         long checkID = ShopLocationsLookup[slot];
-        APLog.LogInfo($"{slot} checked: {checkID}");
         Session.Locations.CompleteLocationChecks(checkID);
         ServerData.Checked.Add(checkID);
     }
