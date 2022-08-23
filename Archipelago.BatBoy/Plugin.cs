@@ -58,12 +58,6 @@ namespace Archipelago.BatBoy
             {
                 ArchipelagoClient.DequeueUnlocks();
             }
-            
-            // we disconnected at some point so reconnect
-            if (!ArchipelagoClient.Authenticated && ArchipelagoClient.ServerData.HostName != null)
-            {
-                ArchipelagoClient.Connect();
-            }
         }
 
         private void LoadAPInfo(int slot)
