@@ -38,7 +38,7 @@ public class ArchipelagoClient
 
     private static Dictionary<LevelLocation, long> LevelLocationsLookup = new Dictionary<LevelLocation, long>();
     private static Dictionary<ShopSlots, long> ShopLocationsLookup = new Dictionary<ShopSlots, long>();
-    public static Dictionary<string, int> ArchipelagoIndexes = new Dictionary<string, int>();
+    
     public static float UnlockDequeueTimeout = 0.0f;
     public static List<string> MessageQueue = new List<string>();
     public static float MessageDequeueTimeout = 0.0f;
@@ -322,12 +322,12 @@ public class ArchipelagoClient
                         break;
                 }
             }
-        }/* TODO not sure how to handle this yet
-        foreach (ShopSlots i in Enum.GetValues(typeof(ShopSlots)))
+        }
+        foreach (ShopSlots i in ServerData.ShopSlotsChecked)
         {
-            if (ServerData.Checked.Contains(ShopLocationsLookup[i]))
-                continue;
-        }*/
+            if (!ServerData.Checked.Contains(ShopLocationsLookup[i]))
+                CheckLocation(i);
+        }
     }
 
     public static void CheckLocation(Level level, LocationType locationType)
@@ -339,6 +339,9 @@ public class ArchipelagoClient
 
     public static void CheckLocation(ShopSlots slot)
     {
+        while (ServerData.ShopSlotsChecked.Contains(slot))
+            ++slot;
+        ServerData.ShopSlotsChecked.Add(slot);
         long checkID = ShopLocationsLookup[slot];
         Session.Locations.CompleteLocationChecks(checkID);
         ServerData.Checked.Add(checkID);
