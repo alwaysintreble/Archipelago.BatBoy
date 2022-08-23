@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
+using Archipelago.BatBoy.ServerCommunication;
 using BepInEx;
 using HarmonyLib;
 using UnityEngine;
@@ -16,16 +18,12 @@ namespace Archipelago.BatBoy
         public const string Game = "BatBoy";
 
         private ArchipelagoClient _AP;
-        private string _apServerUri = "localhost";
-        private int _apServerPort = 38281;
-        private bool _willConnectToAP = true;
-        private bool _isPlayingAP = false;
-        private string _apSlotName = "Wags";
-        private string _apPassword;
         
         private readonly ArchipelagoItemsController _locationsHandler = new ArchipelagoItemsController();
         private readonly ShopHandler _shopHandler = new ShopHandler();
         private readonly FieldInfo _newGame = AccessTools.Field(typeof(TitleScreen), "NewGame");
+
+        public List<Ability> acquiredAbilities = new List<Ability>();
         
         public BatBoySlot saveSlot;
         
@@ -45,16 +43,14 @@ namespace Archipelago.BatBoy
 
             On.TitleScreen.StartGame += OnGameStart;
             On.UIShop.ShowPopup += OnShopPopup;
-            
-            // TODO AP stuff
         }
 
         private void OnTransaction(On.UIShop.orig_CommitTransaction orig, UIShop self)
         {
             ShopItem purchaseItem = _shopHandler.GetCurrentShopItem(self);
-            if (_shopHandler.TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()))
+            if (ShopHandler.TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()))
             {
-                _locationsHandler.SendShopLocation(purchaseItem);
+                ArchipelagoItemsController.SendShopLocation(purchaseItem);
             }
 
             orig(self);
@@ -63,7 +59,7 @@ namespace Archipelago.BatBoy
         private void OnGameStart(On.TitleScreen.orig_StartGame orig, TitleScreen self, int number)
         {
             // on a new game or if connected before starting up the game, save the connection info
-            if (SaveManager.Savegame.Slots[number].Health == 0 && !ArchipelagoClient.ClientDisconnected)
+            if (SaveManager.Savegame.Slots[number].Health == 0 && !ArchipelagoClient.Authenticated)
             {
                 
             }
@@ -73,7 +69,7 @@ namespace Archipelago.BatBoy
             }
 
             // don't load into the game unless we're connected first
-            if (!ArchipelagoClient.ClientDisconnected)
+            if (!ArchipelagoClient.Authenticated)
             {
                 orig(self, number);
                 saveSlot = SaveManager.Savegame.GetCurrentSlot();
@@ -96,7 +92,7 @@ namespace Archipelago.BatBoy
                 {
                     ++saveSlot.RedSeeds;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received {Items.RedSeed}");
+                    APLog.LogInfo($"Received {Item.RedSeed}");
                 }
             }
 
@@ -106,7 +102,7 @@ namespace Archipelago.BatBoy
                 {
                     ++saveSlot.GreenSeeds;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received {Items.GreenSeed}");
+                    APLog.LogInfo($"Received {Item.GreenSeed}");
                 }
             }
             
@@ -116,7 +112,7 @@ namespace Archipelago.BatBoy
                 {
                     ++saveSlot.GoldenSeeds;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received {Items.GoldenSeed}");
+                    APLog.LogInfo($"Received {Item.GoldenSeed}");
                 }
             }
 
@@ -174,7 +170,7 @@ namespace Archipelago.BatBoy
             }
             
             // If we aren't connected yet draws a text box allowing for the information to be entered
-            if ((ArchipelagoClient.Session == null || !ArchipelagoClient.Authenticated) && ArchipelagoClient.state == ArchipelagoClient.state.Menu)
+            if ((ArchipelagoClient.Session == null || !ArchipelagoClient.Authenticated) && ArchipelagoClient.state == ArchipelagoClient.State.Menu)
             {
                 GUI.Label(new Rect(16, 36, 150, 20), "Host: ");
                 GUI.Label(new Rect(16, 56, 150, 20), "PlayerName: ");
