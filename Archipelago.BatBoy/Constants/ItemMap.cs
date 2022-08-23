@@ -7,16 +7,16 @@ namespace Archipelago.BatBoy;
 
 public static class AbilityMap
 {
-    public static readonly Dictionary<Abilities, FieldInfo> AbilityFields = new Dictionary<Abilities, FieldInfo>()
+    public static readonly Dictionary<Ability, FieldInfo> AbilityFields = new Dictionary<Ability, FieldInfo>()
     {
-        { Abilities.Batspin, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasBatspin)) },
-        { Abilities.SlashBash, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasSlashBash)) },
-        { Abilities.GrapplingRibbon, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasGrapplingRibbon)) },
-        { Abilities.BubbleShield, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasBubbleShield)) },
-        { Abilities.BullRush, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasBullRush)) },
-        { Abilities.WallJump, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasWallJump)) },
-        { Abilities.BouncingBasket, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasBouncingBasket)) },
-        { Abilities.MegaSmash, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasMegaSmash)) },
-        { Abilities.AceStomp, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasAceStomp)) },
+        { Ability.Batspin, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasBatspin)) },
+        { Ability.SlashBash, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasSlashBash)) },
+        { Ability.GrapplingRibbon, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasGrapplingRibbon)) },
+        { Ability.BubbleShield, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasBubbleShield)) },
+        { Ability.BullRush, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasBullRush)) },
+        { Ability.WallJump, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasWallJump)) },
+        { Ability.BouncingBasket, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasBouncingBasket)) },
+        { Ability.MegaSmash, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasMegaSmash)) },
+        { Ability.AceStomp, AccessTools.Field(typeof(BatBoySlot), nameof(BatBoySlot.HasAceStomp)) },
     };
 }
