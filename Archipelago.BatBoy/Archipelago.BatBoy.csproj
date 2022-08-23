@@ -43,4 +43,8 @@
       <HintPath>..\lib\XPLUSGames.SaveSystem.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="docs" />
+  </ItemGroup>
 </Project>

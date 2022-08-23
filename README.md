@@ -1,3 +1,4 @@
+![Archipelago Batboy Image](/docs/BatBoy_AP_Logo_layered.png)
 # What is this?
 This is a mod for the currently unreleased [Bat Boy](https://store.steampowered.com/app/1709350/Bat_Boy/) demo to connect it to the
 [Archipelago architecture](https://github.com/ArchipelagoMW/Archipelago). Currently this only works as a fully remote mod, meaning a server must host the data for the
@@ -5,7 +6,10 @@ randomized game, whether playing a seed by yourself or with other people.
 
 # What's Archipelago?
 Archipelago is a multi-game multiworld randomizer and as this works with it allows this game to be randomized and played in a multiworld with all other
-[Archipelago supported games!](https://archipelago.gg/games). Currently, as the demo only contains 3 levels, this randomizes the seeds and abilities obtained within
+[Archipelago supported games!](https://archipelago.gg/games).
+
+# What gets randomized?
+Currently, as the demo only contains 3 levels, this randomizes the seeds and abilities obtained within
 the demo's 3 levels, as well as the seeds and first hp upgrade in Helsia's shop.
 
 # How do I generate my randomized game?
@@ -22,3 +26,8 @@ the latest release from the [releases page](/releases) and place the `BepInEx` f
 `Manage>browse local files`). Run the game and in the top left connection box enter the connection info to connect and play! `Host Name` is the server IP and port. 
 If you are running the `Multiserver` locally, this is `localhost`, if you're connecting to a friend this will be `IP.Add.ress:38281` and if it's on the website, 
 `archipelago.gg:<port>`. `Name` is the name field from the earlier yaml file (default `YourName1`), and `password` is optional, only required if the host set one.
+
+# Issues
+* Seeds picked up in levels only get sent when the level is cleared. If you exit a level without clearing it  
+* Ability tutorials that trigger at the end of levels will still occur but may not be possible with your toolset.
+The locations send before the tutorial starts so you can simply quit the tutorial to continue playing.
