@@ -11,4 +11,5 @@ public class APData
     public HashSet<long> @Checked = new HashSet<long>();
     public List<Ability> AcquiredAbilities = new List<Ability>();
     public int SaveSlot;
+    public List<ShopSlots> ShopSlotsChecked = new List<ShopSlots>();
 }

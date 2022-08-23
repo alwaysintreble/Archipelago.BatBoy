@@ -48,6 +48,7 @@ namespace Archipelago.BatBoy
             On.TitleScreen.StartGame += OnGameStart;
             On.UIShop.ShowPopup += OnShopPopup;
             On.SaveManager.Save += SaveAPInfo;
+            On.TitleScreen.Exit += OnGameClose;
 
         }
 
@@ -93,12 +94,14 @@ namespace Archipelago.BatBoy
             File.WriteAllText(_filePath + $"connectInfo{slot}", json);
         }
 
+        // all of the shop code will probably need a rewrite when game releases as i had to do a lot of hardcoding
         private void OnTransaction(On.UIShop.orig_CommitTransaction orig, UIShop self)
         {
             var (purchaseItem, itemIndex) = _shopHandler.GetCurrentShopItem(self);
-            if (ShopHandler.TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()))
+            if (ShopHandler.TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()) && 
+                purchaseItem.ShopItemType != ShopItem.ShopItemTypes.GoldenSeed)
             {
-                if (itemIndex == (int)ShopSlots.Consumable)
+                if (itemIndex is not (int)ShopSlots.Slot1)
                 {
                     // somehow check which shop this is here
                     if (!_shopHandler.consumablesBought.Contains(Shop.RedSeedShop))
@@ -133,7 +136,16 @@ namespace Archipelago.BatBoy
                 APLog.LogInfo("Save loaded successfully");
             }
             else
-                APLog.LogInfo("Not Connected to a server");
+            {
+                ArchipelagoClient.Connect();
+            }
+        }
+
+        private void OnGameClose(On.TitleScreen.orig_Exit orig, TitleScreen title)
+        {
+            APLog.LogInfo("Disconnecting...");
+            ArchipelagoClient.Disconnect();
+            orig(title);
         }
 
         private IEnumerator OnShopPopup(On.UIShop.orig_ShowPopup orig, UIShop self, string key)

@@ -2,11 +2,11 @@
 
 public enum Level
 {
-    None,
     GrassyPlains,
     FrozenPeak,
     WindyForest,
 }
+
 
 public enum LocationType
 {
