@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
+using Archipelago.BatBoy.ServerCommunication;
+using UnityEngine;
+
 namespace Archipelago.BatBoy;
 
 public class ArchipelagoItemsController
@@ -11,25 +15,25 @@ public class ArchipelagoItemsController
         if (!saveSlot.LevelsClear.Contains(levelIndex))
         {
             saveGame.Slots[saveGame.CurrentSlot].LevelsClear.Add(levelIndex);
-            SendLocationCheck(LocationType.LevelClear, (Levels)levelIndex);
+            SendLocationCheck(LocationType.LevelClear, (Level)levelIndex);
         }
         else
         {
-            APLog.LogInfo($"{(Levels)levelIndex} {LocationType.LevelClear}");
+            APLog.LogInfo($"{(Level)levelIndex} {LocationType.LevelClear}");
         }
 
         if (StageManager.Instance.CollectedRedSeed &&
             !saveSlot.RedSeedCollectedLevels.Contains(levelIndex))
         {
             saveSlot.RedSeedCollectedLevels.Add(levelIndex);
-            SendLocationCheck(LocationType.RedSeed, (Levels)levelIndex);
+            SendLocationCheck(LocationType.RedSeed, (Level)levelIndex);
         }
 
         if (StageManager.Instance.CollectedGreenSeed &&
             !saveSlot.GreenSeedCollectedLevels.Contains(levelIndex))
         {
             saveSlot.GreenSeedCollectedLevels.Add(levelIndex);
-            SendLocationCheck(LocationType.GreenSeed, (Levels)levelIndex);
+            SendLocationCheck(LocationType.GreenSeed, (Level)levelIndex);
             
         }
 
@@ -37,7 +41,7 @@ public class ArchipelagoItemsController
             !saveSlot.GoldenSeedCollectedLevels.Contains(levelIndex))
         {
             saveSlot.GoldenSeedCollectedLevels.Add(levelIndex);
-            SendLocationCheck(LocationType.GoldenSeed, (Levels)levelIndex);
+            SendLocationCheck(LocationType.GoldenSeed, (Level)levelIndex);
         }
 
         if (StageManager.Instance.CollectedCasette &&
@@ -46,22 +50,22 @@ public class ArchipelagoItemsController
             // TODO There isn't a counter for cassettes they're tied to levels. Investigate
             saveSlot.CasetteCollectedLevels.Add(levelIndex);
         }
-
-        // GetCorrectAbilities(saveGame.GetCurrentSlot());
+        
+        GetCorrectAbilities(saveGame.GetCurrentSlot());
+        
         saveSlot.Crystals += StageManager.Instance.CollectedCrystals;
         if (saveSlot.Crystals > 999)
             saveSlot.Crystals = 999;
         SaveManager.Save();
     }
     
-    // TODO
-    private void SendLocationCheck(LocationType locationType, Levels currentLevel)
+    private void SendLocationCheck(LocationType locationType, Level currentLevel)
     {
+        ArchipelagoClient.CheckLocation(currentLevel, locationType);
         APLog.LogInfo($"{locationType} for {currentLevel} found!");
     }
 
-    // TODO
-    public void SendShopLocation(ShopItem shopItem)
+    public static void SendShopLocation(ShopItem shopItem)
     {
         BatBoySlot saveSlot = SaveManager.Savegame.GetCurrentSlot();
         switch (shopItem.ShopItemType)
@@ -81,19 +85,25 @@ public class ArchipelagoItemsController
             case ShopItem.ShopItemTypes.IncreaseStamina:
                 --saveSlot.Stamina;
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         APLog.LogInfo($"{shopItem.ShopItemType} in shop purchased");
     }
+
 
     // TODO this gets run before the ability tutorial
     // either find a way to skip these tutorials or to do this loop after it
     private void GetCorrectAbilities(BatBoySlot saveSlot)
     {
-        foreach (Abilities ability in Enum.GetValues(typeof(Abilities)))
+        foreach (Ability ability in Enum.GetValues(typeof(Ability)))
         {
-            FieldInfo abilityField = AbilityMap.AbilityFields[ability];
-            abilityField.SetValue(saveSlot, false);
-            APLog.LogInfo("Goodbye Jojo");
+            if (!ArchipelagoClient.acquiredAbilities.Contains(ability))
+            {
+                FieldInfo abilityField = AbilityMap.AbilityFields[ability];
+                abilityField.SetValue(saveSlot, false);
+                APLog.LogInfo($"Goodbye Jojo! ({ability})");
+            }
         }
     }
 }

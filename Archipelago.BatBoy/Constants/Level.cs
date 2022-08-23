@@ -1,6 +1,6 @@
 ﻿namespace Archipelago.BatBoy;
 
-public enum Levels
+public enum Level
 {
     None,
     GrassyPlains,
@@ -15,6 +15,11 @@ public enum LocationType
     GoldenSeed,
     Casette,
     LevelClear,
+}
+
+public enum Shop
+{
+    RedSeedShop,
 }
 
 public enum ShopSlots

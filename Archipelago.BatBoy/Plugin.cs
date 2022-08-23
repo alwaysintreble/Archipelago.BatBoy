@@ -1,10 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using Archipelago.BatBoy.ServerCommunication;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+
 using BepInEx;
-using HarmonyLib;
 using UnityEngine;
+
+using XPLUSGames.Base.SaveSystem;
+using Archipelago.BatBoy.ServerCommunication;
 
 namespace Archipelago.BatBoy
 {
@@ -16,12 +21,9 @@ namespace Archipelago.BatBoy
         public const string PluginName = "Archipelago";
         public const string PluginVersion = "0.1.0";
         public const string Game = "BatBoy";
-
-        private ArchipelagoClient _AP;
         
         private readonly ArchipelagoItemsController _locationsHandler = new ArchipelagoItemsController();
         private readonly ShopHandler _shopHandler = new ShopHandler();
-        private readonly FieldInfo _newGame = AccessTools.Field(typeof(TitleScreen), "NewGame");
 
         public List<Ability> acquiredAbilities = new List<Ability>();
         
@@ -32,8 +34,7 @@ namespace Archipelago.BatBoy
             APLog.Init(Logger);
             APLog.LogInfo("Hello World!");
             
-            _AP = new ArchipelagoClient();
-            //_AP.OnClientDisconnect += AP_OnClientDisconnect;
+            ArchipelagoClient.Init();
             
             // This only gets called on clearing levels but is the easiest way to handle collecting the seeds and
             // changing the ability states. Investigate other methods but unlikely.
@@ -43,14 +44,48 @@ namespace Archipelago.BatBoy
 
             On.TitleScreen.StartGame += OnGameStart;
             On.UIShop.ShowPopup += OnShopPopup;
+            On.SaveManager.Save += SaveAPInfo;
+
+        }
+
+        private void Update()
+        {
+            if (ArchipelagoClient.Authenticated && saveSlot != null)
+            {
+                ArchipelagoClient.DequeueUnlocks();
+            }
+        }
+
+        private void SaveAPInfo(On.SaveManager.orig_Save orig)
+        {
+            orig();
+
+            string json = JsonConvert.SerializeObject(ArchipelagoClient.ServerData);
+            string abilities = JsonConvert.SerializeObject(acquiredAbilities);
+            int slot = SaveManager.Savegame.CurrentSlot;
+            System.IO.File.WriteAllText($@"APConnectionInfo{SaveManager.Savegame.CurrentSlot}.xml", json + abilities);
         }
 
         private void OnTransaction(On.UIShop.orig_CommitTransaction orig, UIShop self)
         {
-            ShopItem purchaseItem = _shopHandler.GetCurrentShopItem(self);
+            var (purchaseItem, itemIndex) = _shopHandler.GetCurrentShopItem(self);
             if (ShopHandler.TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()))
             {
-                ArchipelagoItemsController.SendShopLocation(purchaseItem);
+                if (itemIndex == (int)ShopSlots.Consumable)
+                {
+                    // somehow check which shop this is here
+                    if (!_shopHandler.consumablesBought.Contains(Shop.RedSeedShop))
+                    {
+                        _shopHandler.consumablesBought.Add(Shop.RedSeedShop);
+                        ArchipelagoItemsController.SendShopLocation(purchaseItem);
+                        ArchipelagoClient.CheckLocation((ShopSlots)itemIndex);
+                    }
+                }
+                else
+                {
+                    ArchipelagoClient.CheckLocation((ShopSlots)itemIndex);
+                    ArchipelagoItemsController.SendShopLocation(purchaseItem);
+                }
             }
 
             orig(self);
@@ -58,22 +93,23 @@ namespace Archipelago.BatBoy
 
         private void OnGameStart(On.TitleScreen.orig_StartGame orig, TitleScreen self, int number)
         {
-            // on a new game or if connected before starting up the game, save the connection info
-            if (SaveManager.Savegame.Slots[number].Health == 0 && !ArchipelagoClient.Authenticated)
-            {
-                
-            }
-            else // attempt to connect from saved information if it exists
-            {
-                
-            }
-
-            // don't load into the game unless we're connected first
-            if (!ArchipelagoClient.Authenticated)
+            // new game and we're already connected
+            if (SaveManager.Savegame.Slots[number].Health == 0 && ArchipelagoClient.Authenticated)
             {
                 orig(self, number);
                 saveSlot = SaveManager.Savegame.GetCurrentSlot();
                 APLog.LogInfo("Save loaded successfully");
+            } // not a new game but we're connected already
+            else if (ArchipelagoClient.Authenticated)
+            {
+                orig(self, number);
+                saveSlot = SaveManager.Savegame.GetCurrentSlot();
+                APLog.LogInfo("Save loaded successfully");
+                
+            } // we aren't authenticated yet but we do have saved information
+            else if (SaveManager.Savegame.Slots[number].Health != 0)
+            {
+                
             }
         }
 
@@ -86,73 +122,73 @@ namespace Archipelago.BatBoy
         {
             #if DEBUG
             // Debug buttons to grant items and abilities :)
-            if (GUI.Button(new Rect(0, 10, 50, 50), "Red Seeds"))
+            if (GUI.Button(new Rect(0, 100, 50, 50), "Red Seeds"))
             {
                 if (saveSlot != null)
                 {
                     ++saveSlot.RedSeeds;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received {Item.RedSeed}");
+                    APLog.LogInfo($"Cheated {Item.RedSeed}");
                 }
             }
 
-            if (GUI.Button(new Rect(50, 10, 50, 50), "Green Seeds"))
+            if (GUI.Button(new Rect(50, 100, 50, 50), "Green Seeds"))
             {
                 if (saveSlot != null)
                 {
                     ++saveSlot.GreenSeeds;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received {Item.GreenSeed}");
+                    APLog.LogInfo($"Cheated {Item.GreenSeed}");
                 }
             }
             
-            if (GUI.Button(new Rect(100, 10, 50, 50), "Golden Seeds"))
+            if (GUI.Button(new Rect(100, 100, 50, 50), "Golden Seeds"))
             {
                 if (saveSlot != null)
                 {
                     ++saveSlot.GoldenSeeds;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received {Item.GoldenSeed}");
+                    APLog.LogInfo($"Cheated {Item.GoldenSeed}");
                 }
             }
 
-            if (GUI.Button(new Rect(150, 10, 50, 50), "100 Crystals"))
+            if (GUI.Button(new Rect(150, 100, 50, 50), "100 Crystals"))
             {
                 if (saveSlot != null)
                 {
                     saveSlot.Crystals += 100;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received 100 Crystals");
+                    APLog.LogInfo($"Cheated 100 Crystals");
                 }
             }
 
-            if (GUI.Button(new Rect(200, 10, 50, 50), "Bat Spin"))
+            if (GUI.Button(new Rect(200, 100, 50, 50), "Bat Spin"))
             {
                 if (saveSlot != null)
                 {
                     saveSlot.HasBatspin = true;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received Bat Spin");
+                    APLog.LogInfo($"Cheated Bat Spin");
                 }
             }
 
-            if (GUI.Button(new Rect(250, 10, 50, 50), "Slash Bash"))
+            if (GUI.Button(new Rect(250, 100, 50, 50), "Slash Bash"))
             {
                 if (saveSlot != null)
                 {
                     saveSlot.HasSlashBash = true;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received Slash Bash");
+                    APLog.LogInfo($"Cheated Slash Bash");
                 }
             }
 
-            if (GUI.Button(new Rect(300, 10, 50, 50), "Grappling Ribbon"))
+            if (GUI.Button(new Rect(300, 100, 50, 50), "Grappling Ribbon"))
             {
                 if (saveSlot != null)
                 {
                     saveSlot.HasGrapplingRibbon = true;
                     SaveManager.Save();
-                    APLog.LogInfo($"Received Grappling Ribbon");
+                    APLog.LogInfo($"Cheated Grappling Ribbon");
                 }
             }
             #endif
@@ -170,7 +206,8 @@ namespace Archipelago.BatBoy
             }
             
             // If we aren't connected yet draws a text box allowing for the information to be entered
-            if ((ArchipelagoClient.Session == null || !ArchipelagoClient.Authenticated) && ArchipelagoClient.state == ArchipelagoClient.State.Menu)
+            if ((ArchipelagoClient.Session == null || !ArchipelagoClient.Authenticated) 
+                && ArchipelagoClient.state == ArchipelagoClient.State.Menu)
             {
                 GUI.Label(new Rect(16, 36, 150, 20), "Host: ");
                 GUI.Label(new Rect(16, 56, 150, 20), "PlayerName: ");

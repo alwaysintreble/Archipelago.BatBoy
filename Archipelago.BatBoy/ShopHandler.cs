@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 
@@ -8,6 +9,7 @@ public class ShopHandler
 {
     private readonly FieldInfo _shopItemsInfo;
     private readonly FieldInfo _selectedItemInfo;
+    public List<Shop> consumablesBought = new List<Shop>();
 
     public ShopHandler()
     {
@@ -15,7 +17,7 @@ public class ShopHandler
         _selectedItemInfo = AccessTools.Field(typeof(UIShop), "selectedItemIndex");
     }
 
-    public ShopItem GetCurrentShopItem(UIShop currentShop)
+    public Tuple<ShopItem, int> GetCurrentShopItem(UIShop currentShop)
     {
         ShopItem[] shopItems = _shopItemsInfo.GetValue(currentShop) as ShopItem[];
         int selectedItemIndex = (int)_selectedItemInfo.GetValue(currentShop);
@@ -25,7 +27,7 @@ public class ShopHandler
         }
         ShopItem shopItem = shopItems[selectedItemIndex];
 
-        return shopItem;
+        return new Tuple<ShopItem, int>(shopItem, selectedItemIndex);
     }
 
     public static bool TransactionIsDone(ShopItem currentItem, BatBoySlot saveSlot)
