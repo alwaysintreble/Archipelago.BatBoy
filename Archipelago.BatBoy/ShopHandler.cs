@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using HarmonyLib;
 
 namespace Archipelago.BatBoy;
@@ -18,47 +19,25 @@ public class ShopHandler
     {
         ShopItem[] shopItems = _shopItemsInfo.GetValue(currentShop) as ShopItem[];
         int selectedItemIndex = (int)_selectedItemInfo.GetValue(currentShop);
+        if (shopItems == null)
+        {
+            throw new ArgumentOutOfRangeException();
+        }
         ShopItem shopItem = shopItems[selectedItemIndex];
 
         return shopItem;
     }
 
-    public bool TransactionIsDone(ShopItem currentItem, BatBoySlot saveSlot)
+    public static bool TransactionIsDone(ShopItem currentItem, BatBoySlot saveSlot)
     {
-        switch (currentItem.ShopCurrency)
+        return currentItem.ShopCurrency switch
         {
-            case ShopItem.ShopCurrencies.Crystals:
-                if (currentItem.Cost <= saveSlot.Crystals + StageManager.Instance.CollectedCrystals)
-                {
-                    return true;
-                    
-                }
-
-                return false;
-            case ShopItem.ShopCurrencies.StageCrystals:
-                if (currentItem.Cost <= StageManager.Instance.CollectedCrystals)
-                {
-                    return true;
-                    
-                }
-
-                return false;
-            case ShopItem.ShopCurrencies.RedGoldenSeed:
-                if (currentItem.Cost <= saveSlot.RedSeeds + saveSlot.GoldenSeeds)
-                {
-                    return true;
-                }
-
-                return false;
-            case ShopItem.ShopCurrencies.GreenGoldenSeed:
-                if (currentItem.Cost <= saveSlot.GreenSeeds + saveSlot.GoldenSeeds)
-                {
-                    return true;
-                }
-
-                return false;
-        }
-
-        return false;
+            ShopItem.ShopCurrencies.Crystals => currentItem.Cost <=
+                                                saveSlot.Crystals + StageManager.Instance.CollectedCrystals,
+            ShopItem.ShopCurrencies.StageCrystals => currentItem.Cost <= StageManager.Instance.CollectedCrystals,
+            ShopItem.ShopCurrencies.RedGoldenSeed => currentItem.Cost <= saveSlot.RedSeeds + saveSlot.GoldenSeeds,
+            ShopItem.ShopCurrencies.GreenGoldenSeed => currentItem.Cost <= saveSlot.GreenSeeds + saveSlot.GoldenSeeds,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 }
