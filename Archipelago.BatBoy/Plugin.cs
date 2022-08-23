@@ -48,6 +48,7 @@ namespace Archipelago.BatBoy
             On.TitleScreen.StartGame += OnGameStart;
             On.UIShop.ShowPopup += OnShopPopup;
             On.SaveManager.Save += SaveAPInfo;
+            On.TitleScreen.Exit += OnGameClose;
 
         }
 
@@ -56,6 +57,12 @@ namespace Archipelago.BatBoy
             if (ArchipelagoClient.Authenticated && saveSlot != null)
             {
                 ArchipelagoClient.DequeueUnlocks();
+            }
+            
+            // we disconnected at some point so reconnect
+            if (!ArchipelagoClient.Authenticated && ArchipelagoClient.ServerData.HostName != null)
+            {
+                ArchipelagoClient.Connect();
             }
         }
 
@@ -96,7 +103,8 @@ namespace Archipelago.BatBoy
         private void OnTransaction(On.UIShop.orig_CommitTransaction orig, UIShop self)
         {
             var (purchaseItem, itemIndex) = _shopHandler.GetCurrentShopItem(self);
-            if (ShopHandler.TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()))
+            if (ShopHandler.TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()) && 
+                purchaseItem.ShopItemType != ShopItem.ShopItemTypes.GoldenSeed)
             {
                 if (itemIndex == (int)ShopSlots.Consumable)
                 {
@@ -133,7 +141,15 @@ namespace Archipelago.BatBoy
                 APLog.LogInfo("Save loaded successfully");
             }
             else
-                APLog.LogInfo("Not Connected to a server");
+            {
+                ArchipelagoClient.Connect();
+            }
+        }
+
+        private void OnGameClose(On.TitleScreen.orig_Exit orig, TitleScreen title)
+        {
+            ArchipelagoClient.Disconnect();
+            orig(title);
         }
 
         private IEnumerator OnShopPopup(On.UIShop.orig_ShowPopup orig, UIShop self, string key)
