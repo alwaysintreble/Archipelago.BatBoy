@@ -56,28 +56,28 @@ public class ArchipelagoClient
         const long shopCodeOffset = 200;
 
         // add items and abilities to item lookup dictionary
-        foreach (int i in Enum.GetValues(typeof(Item)))
+        foreach (Item i in Enum.GetValues(typeof(Item)))
         { 
-            ItemsLookup[baseCodeOffset + i] = (Item)i;
+            ItemsLookup[baseCodeOffset + (int)i] = i;
         }
-        foreach (int i in Enum.GetValues(typeof(Ability)))
+        foreach (Ability i in Enum.GetValues(typeof(Ability)))
         {
-            AbilitiesLookup[baseCodeOffset + abilityCodeOffset + i] = (Ability)i;
+            AbilitiesLookup[baseCodeOffset + abilityCodeOffset + (int)i] = i;
         }
         
         // add locations and shops to location lookup dictionary
-        foreach (int i in Enum.GetValues(typeof(Level)))
+        foreach (Level i in Enum.GetValues(typeof(Level)))
         {
-            foreach (int j in Enum.GetValues(typeof(LocationType)))
+            foreach (LocationType j in Enum.GetValues(typeof(LocationType)))
             {
-                LevelLocationsLookup[new LevelLocation((Level)i, (LocationType)j)] =
-                    baseCodeOffset + i + j;
+                LevelLocationsLookup[new LevelLocation(i, j)] =
+                    baseCodeOffset + ((int)i * 5) + (int)j;
             }
         }
         // only one shop so pseudo hard coding this for now
-        foreach (int i in Enum.GetValues(typeof(ShopSlots)))
+        foreach (ShopSlots i in Enum.GetValues(typeof(ShopSlots)))
         {
-            ShopLocationsLookup[(ShopSlots)i] = baseCodeOffset + shopCodeOffset + i;
+            ShopLocationsLookup[i] = baseCodeOffset + shopCodeOffset + (int)i;
         }
         
         #if DEBUG
@@ -289,20 +289,61 @@ public class ArchipelagoClient
         BatBoySlot saveSlot = SaveManager.Savegame.GetCurrentSlot();
         AbilityMap.AbilityFields[unlockAbility].SetValue(saveSlot, true);
         APLog.LogInfo($"Received {unlockAbility}!");
-        acquiredAbilities.Add(unlockAbility);
+        ServerData.AcquiredAbilities.Add(unlockAbility);
         SaveManager.Save();
+    }
+
+    public static void SendAsyncChecks()
+    {
+        BatBoySlot saveSlot = SaveManager.Savegame.GetCurrentSlot();
+        foreach (int i in Enum.GetValues(typeof(Level)))
+        {
+            foreach (LocationType j in Enum.GetValues(typeof(LocationType)))
+            {
+                if (ServerData.Checked.Contains(LevelLocationsLookup[new LevelLocation((Level)i, j)])) 
+                    continue;
+                switch (j)
+                {
+                    case LocationType.RedSeed:
+                        if(saveSlot.RedSeedCollectedLevels.Contains(i))
+                            CheckLocation((Level)i, j);
+                        break;
+                    case LocationType.GreenSeed:
+                        if (saveSlot.GreenSeedCollectedLevels.Contains(i))
+                            CheckLocation((Level)i, j);
+                        break;
+                    case LocationType.GoldenSeed:
+                        if (saveSlot.GoldenSeedCollectedLevels.Contains(i))
+                            CheckLocation((Level)i, j);
+                        break;
+                    case LocationType.LevelClear:
+                        if (saveSlot.LevelsClear.Contains(i))
+                            CheckLocation((Level)i, j);
+                        break;
+                }
+            }
+        }/* TODO not sure how to handle this yet
+        foreach (ShopSlots i in Enum.GetValues(typeof(ShopSlots)))
+        {
+            if (ServerData.Checked.Contains(ShopLocationsLookup[i]))
+                continue;
+        }*/
     }
 
     public static void CheckLocation(Level level, LocationType locationType)
     {
+        long checkID = LevelLocationsLookup[new LevelLocation(level, locationType)];
         APLog.LogInfo($"Level {level} location {locationType}");
-        Session.Locations.CompleteLocationChecks(
-            LevelLocationsLookup[new LevelLocation(level, locationType)]);
+        Session.Locations.CompleteLocationChecks(checkID);
+        ServerData.Checked.Add(checkID);
     }
 
     public static void CheckLocation(ShopSlots slot)
     {
-        Session.Locations.CompleteLocationChecks(ShopLocationsLookup[slot]);
+        long checkID = ShopLocationsLookup[slot];
+        APLog.LogInfo($"{slot} checked: {checkID}");
+        Session.Locations.CompleteLocationChecks(checkID);
+        ServerData.Checked.Add(checkID);
     }
     
 }

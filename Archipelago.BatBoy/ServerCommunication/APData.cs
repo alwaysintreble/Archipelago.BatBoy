@@ -9,4 +9,6 @@ public class APData
     public string SlotName;
     public string Password;
     public HashSet<long> @Checked = new HashSet<long>();
+    public List<Ability> AcquiredAbilities = new List<Ability>();
+    public int SaveSlot;
 }

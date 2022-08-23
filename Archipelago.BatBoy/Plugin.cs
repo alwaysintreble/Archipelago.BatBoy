@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -25,7 +26,9 @@ namespace Archipelago.BatBoy
         private readonly ArchipelagoItemsController _locationsHandler = new ArchipelagoItemsController();
         private readonly ShopHandler _shopHandler = new ShopHandler();
 
-        public List<Ability> acquiredAbilities = new List<Ability>();
+
+        private readonly string _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            @"..\Bat Boy Demo\BepInEx\plugins\Archipelago\saves\"); // TODO this will need to change when game releases
         
         public BatBoySlot saveSlot;
         
@@ -56,14 +59,38 @@ namespace Archipelago.BatBoy
             }
         }
 
+        private void LoadAPInfo(int slot)
+        {
+            var path = _filePath + $"connectInfo{slot}";
+            if (File.Exists(path))
+            {
+                using (StreamReader reader = new StreamReader(path))
+                {
+                    APData tempData = JsonConvert.DeserializeObject<APData>(reader.ReadToEnd());
+                    if (ArchipelagoClient.Authenticated && SaveManager.Savegame.GetCurrentSlot().Health != 0)
+                    {
+                        ArchipelagoClient.ServerData.Checked = tempData.Checked;
+                        ArchipelagoClient.ServerData.AcquiredAbilities = tempData.AcquiredAbilities;
+                    }
+                    else
+                        ArchipelagoClient.ServerData = tempData;
+
+                    if (ArchipelagoClient.Connect() && ArchipelagoClient.ServerData.Checked != null)
+                        ArchipelagoClient.Session.Locations.
+                            CompleteLocationChecks(ArchipelagoClient.ServerData.Checked.ToArray());
+                }
+            }
+        }
+
         private void SaveAPInfo(On.SaveManager.orig_Save orig)
         {
             orig();
-
+            
             string json = JsonConvert.SerializeObject(ArchipelagoClient.ServerData);
-            string abilities = JsonConvert.SerializeObject(acquiredAbilities);
             int slot = SaveManager.Savegame.CurrentSlot;
-            System.IO.File.WriteAllText($@"APConnectionInfo{SaveManager.Savegame.CurrentSlot}.xml", json + abilities);
+            if (!Directory.Exists(_filePath))
+                Directory.CreateDirectory(_filePath);
+            File.WriteAllText(_filePath + $"connectInfo{slot}", json);
         }
 
         private void OnTransaction(On.UIShop.orig_CommitTransaction orig, UIShop self)
@@ -93,24 +120,20 @@ namespace Archipelago.BatBoy
 
         private void OnGameStart(On.TitleScreen.orig_StartGame orig, TitleScreen self, int number)
         {
-            // new game and we're already connected
-            if (SaveManager.Savegame.Slots[number].Health == 0 && ArchipelagoClient.Authenticated)
+            if (SaveManager.Savegame.Slots[number].Health != 0)
             {
-                orig(self, number);
-                saveSlot = SaveManager.Savegame.GetCurrentSlot();
-                APLog.LogInfo("Save loaded successfully");
-            } // not a new game but we're connected already
-            else if (ArchipelagoClient.Authenticated)
-            {
-                orig(self, number);
-                saveSlot = SaveManager.Savegame.GetCurrentSlot();
-                APLog.LogInfo("Save loaded successfully");
-                
-            } // we aren't authenticated yet but we do have saved information
-            else if (SaveManager.Savegame.Slots[number].Health != 0)
-            {
-                
+                LoadAPInfo(number);
+                ArchipelagoClient.SendAsyncChecks();
             }
+
+            if (ArchipelagoClient.Authenticated)
+            {
+                orig(self, number);
+                saveSlot = SaveManager.Savegame.GetCurrentSlot();
+                APLog.LogInfo("Save loaded successfully");
+            }
+            else
+                APLog.LogInfo("Not Connected to a server");
         }
 
         private IEnumerator OnShopPopup(On.UIShop.orig_ShowPopup orig, UIShop self, string key)
