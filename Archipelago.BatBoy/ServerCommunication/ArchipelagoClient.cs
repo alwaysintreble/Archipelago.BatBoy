@@ -8,42 +8,32 @@ using UnityEngine;
 
 namespace Archipelago.BatBoy.ServerCommunication;
 
-public class ArchipelagoClient
+public static class ArchipelagoClient
 {
-    public enum State
+    private struct LevelLocation
     {
-        Menu,
-        InGame,
-        Overworld,
-        Level,
-        Tutorial
-    }
-
-    public struct LevelLocation
-    {
-        public Level Level;
-        public LocationType LocationType;
+        private Level _level;
+        private LocationType _locationType;
 
         public LevelLocation(Level level, LocationType locationType)
         {
-            Level = level;
-            LocationType = locationType;
+            _level = level;
+            _locationType = locationType;
         }
     }
 
     public static readonly int[] APVersion = new int[] { 0, 3, 4 };
     public static APData ServerData = new APData();
-    private static Dictionary<long, Item> ItemsLookup = new Dictionary<long, Item>();
-    private static Dictionary<long, Ability> AbilitiesLookup = new Dictionary<long, Ability>();
+    private static readonly Dictionary<long, Item> ItemsLookup = new Dictionary<long, Item>();
+    private static readonly Dictionary<long, Ability> AbilitiesLookup = new Dictionary<long, Ability>();
 
-    private static Dictionary<LevelLocation, long> LevelLocationsLookup = new Dictionary<LevelLocation, long>();
-    private static Dictionary<ShopSlots, long> ShopLocationsLookup = new Dictionary<ShopSlots, long>();
-    
-    public static float UnlockDequeueTimeout = 0.0f;
-    public static List<string> MessageQueue = new List<string>();
-    public static float MessageDequeueTimeout = 0.0f;
-    public static bool Silent = false;
-    public static State state = State.Menu;
+    private static readonly Dictionary<LevelLocation, long> LevelLocationsLookup = new Dictionary<LevelLocation, long>();
+    private static readonly Dictionary<ShopSlots, long> ShopLocationsLookup = new Dictionary<ShopSlots, long>();
+
+    private static float _unlockDequeueTimeout = 0.0f;
+    private static readonly List<string> MessageQueue = new List<string>();
+    private static float _messageDequeueTimeout = 0.0f;
+    private static readonly bool Silent = false;
     public static bool Authenticated;
 
     public static ArchipelagoSession Session;
@@ -123,15 +113,12 @@ public class ArchipelagoClient
         if (loginResult is LoginSuccessful loginSuccess)
         {
             Authenticated = true;
-            state = State.InGame;
             // if (loginSuccess.SlotData.ContainsKey()){}
         }
         else if (loginResult is LoginFailure loginFailure)
         {
-            Authenticated = false;
             APLog.LogError("Connection Error: " + String.Join("\n", loginFailure.Errors));
-            Session.Socket.Disconnect();
-            Session = null;
+            Disconnect();
         }
         return loginResult.Successful;
     }
@@ -156,7 +143,6 @@ public class ArchipelagoClient
             Session.Socket.Disconnect();
         Session = null;
         Authenticated = false;
-        state = State.Menu;
     }
 
     public static void Session_PacketReceived(ArchipelagoPacketBase packet)
@@ -215,10 +201,10 @@ public class ArchipelagoClient
         const int DequeueCount = 2;
         const float DequeueTime = 3.0f;
 
-        if (UnlockDequeueTimeout > 0.0f) UnlockDequeueTimeout -= Time.deltaTime;
-        if (MessageDequeueTimeout > 0.0f) MessageDequeueTimeout -= Time.deltaTime;
+        if (_unlockDequeueTimeout > 0.0f) _unlockDequeueTimeout -= Time.deltaTime;
+        if (_messageDequeueTimeout > 0.0f) _messageDequeueTimeout -= Time.deltaTime;
 
-        if (MessageDequeueTimeout <= 0.0f)
+        if (_messageDequeueTimeout <= 0.0f)
         {
             // queue these up so the screen doesn't get crowded
             List<string> ToProcess = new List<string>();
@@ -233,27 +219,25 @@ public class ArchipelagoClient
                 APLog.LogInfo(message);
             }
 
-            MessageDequeueTimeout = DequeueTime;
+            _messageDequeueTimeout = DequeueTime;
         }
         
         // unlock items
-        if (state != State.Tutorial)
+        if (ServerData.Index < Session.Items.AllItemsReceived.Count)
         {
-            if (ServerData.Index < Session.Items.AllItemsReceived.Count)
+            long currentItemID = Session.Items.AllItemsReceived[Convert.ToInt32(ServerData.Index)].Item;
+            if (ItemsLookup.ContainsKey(currentItemID))
             {
-                long currentItemID = Session.Items.AllItemsReceived[Convert.ToInt32(ServerData.Index)].Item;
-                if (ItemsLookup.ContainsKey(currentItemID))
-                {
-                    Unlock(ItemsLookup[currentItemID]);
-                }
-                else
-                {
-                    Unlock(AbilitiesLookup[currentItemID]);
-                }
-                ++ServerData.Index;
-                UnlockDequeueTimeout = DequeueTime;
+                Unlock(ItemsLookup[currentItemID]);
             }
+            else
+            {
+                Unlock(AbilitiesLookup[currentItemID]);
+            }
+            ++ServerData.Index;
+            _unlockDequeueTimeout = DequeueTime;
         }
+        
     }
 
     public static void Unlock(Item unlockItem)

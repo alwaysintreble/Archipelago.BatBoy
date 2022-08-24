@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 
-namespace Archipelago.BatBoy;
+namespace Archipelago.BatBoy.DataHandling;
 
 public class ShopHandler
 {
     private readonly FieldInfo _shopItemsInfo;
     private readonly FieldInfo _selectedItemInfo;
-    public List<Shop> consumablesBought = new List<Shop>();
+    public readonly List<Shop> ConsumablesBought = new List<Shop>();
 
     public ShopHandler()
     {
