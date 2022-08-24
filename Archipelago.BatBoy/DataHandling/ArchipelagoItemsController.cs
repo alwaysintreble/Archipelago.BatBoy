@@ -9,6 +9,7 @@ public class ArchipelagoItemsController
     public void SaveLevelClear(On.BatBoySaveGame.orig_SaveLevelClear orig, BatBoySaveGame saveGame, int levelIndex)
     {
         BatBoySlot saveSlot = saveGame.Slots[saveGame.CurrentSlot];
+        StageManager.Instance.LevelAlreadyClearedBefore = true;
         
         if (!saveSlot.LevelsClear.Contains(levelIndex))
         {
@@ -62,7 +63,7 @@ public class ArchipelagoItemsController
     private void SendLocationCheck(LocationType locationType, Level currentLevel)
     {
         --currentLevel;
-        ArchipelagoClient.CheckLocation(currentLevel, locationType);
+        LocationsAndItemsHelper.CheckLocation(currentLevel, locationType);
         APLog.LogInfo($"{locationType} for {currentLevel} found!");
     }
 
@@ -92,9 +93,6 @@ public class ArchipelagoItemsController
         APLog.LogInfo($"{shopItem.ShopItemType} in shop purchased");
     }
 
-
-    // TODO this gets run before the ability tutorial
-    // either find a way to skip these tutorials or to do this loop after it
     private void GetCorrectAbilities(BatBoySlot saveSlot)
     {
         #if DEBUG
