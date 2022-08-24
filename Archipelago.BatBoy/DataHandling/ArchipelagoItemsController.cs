@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Archipelago.BatBoy.ServerCommunication;
-using UnityEngine;
 
-namespace Archipelago.BatBoy;
+namespace Archipelago.BatBoy.DataHandling;
 
 public class ArchipelagoItemsController
 {
@@ -48,6 +46,8 @@ public class ArchipelagoItemsController
             !saveSlot.CasetteCollectedLevels.Contains(levelIndex))
         {
             // TODO There isn't a counter for cassettes they're tied to levels. Investigate
+            // perhaps since the cassettes don't actually unlock anything currently i just
+            // add them to the list in numerical order when received?
             saveSlot.CasetteCollectedLevels.Add(levelIndex);
         }
         

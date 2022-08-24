@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Archipelago.BatBoy.DataHandling;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 using BepInEx;
 using UnityEngine;
 
-using XPLUSGames.Base.SaveSystem;
 using Archipelago.BatBoy.ServerCommunication;
 
 namespace Archipelago.BatBoy
 {
-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     public class Plugin : BaseUnityPlugin
     {
         public const string PluginGUID = "com.alwaysintreble.Archipelago.BatBoy";
         public const string PluginAuthor = "alwaysintreble";
         public const string PluginName = "Archipelago";
         public const string PluginVersion = "0.1.0";
-        public const string Game = "BatBoy";
         
         private readonly ArchipelagoItemsController _locationsHandler = new ArchipelagoItemsController();
         private readonly ShopHandler _shopHandler = new ShopHandler();
@@ -54,15 +51,13 @@ namespace Archipelago.BatBoy
 
         private void Update()
         {
-            if (ArchipelagoClient.Authenticated && saveSlot != null)
-            {
+            if (saveSlot != null && ArchipelagoClient.Authenticated)
                 ArchipelagoClient.DequeueUnlocks();
-            }
         }
 
         private void LoadAPInfo(int slot)
         {
-            var path = _filePath + $"connectInfo{slot}";
+            var path = _filePath + $"connectInfo{slot}.apbb";
             if (File.Exists(path))
             {
                 using (StreamReader reader = new StreamReader(path))
@@ -91,7 +86,7 @@ namespace Archipelago.BatBoy
             int slot = SaveManager.Savegame.CurrentSlot;
             if (!Directory.Exists(_filePath))
                 Directory.CreateDirectory(_filePath);
-            File.WriteAllText(_filePath + $"connectInfo{slot}", json);
+            File.WriteAllText(_filePath + $"connectInfo{slot}.apbb", json);
         }
 
         // all of the shop code will probably need a rewrite when game releases as i had to do a lot of hardcoding
@@ -104,9 +99,9 @@ namespace Archipelago.BatBoy
                 if (itemIndex is not (int)ShopSlots.Slot1)
                 {
                     // somehow check which shop this is here
-                    if (!_shopHandler.consumablesBought.Contains(Shop.RedSeedShop))
+                    if (!_shopHandler.ConsumablesBought.Contains(Shop.RedSeedShop))
                     {
-                        _shopHandler.consumablesBought.Add(Shop.RedSeedShop);
+                        _shopHandler.ConsumablesBought.Add(Shop.RedSeedShop);
                         ArchipelagoItemsController.SendShopLocation(purchaseItem);
                         ArchipelagoClient.CheckLocation((ShopSlots)itemIndex);
                     }
@@ -231,19 +226,13 @@ namespace Archipelago.BatBoy
             // Shows whether we're currently connected to the ap server
             string apVersion = "Archipelago v" + "." + ArchipelagoClient.APVersion[0] + "." +
                                ArchipelagoClient.APVersion[1] + "." + ArchipelagoClient.APVersion[2];
-            if (ArchipelagoClient.Session != null)
+            if (ArchipelagoClient.Authenticated)
             {
                 GUI.Label(new Rect(16, 16, 300, 20), apVersion + " Status: Connected");
             }
-            else
+            else // show we aren't connected and a text box allowing the info to be entered
             {
                 GUI.Label(new Rect(16, 16, 300, 20), apVersion + " Status: Not Connected");
-            }
-            
-            // If we aren't connected yet draws a text box allowing for the information to be entered
-            if ((ArchipelagoClient.Session == null || !ArchipelagoClient.Authenticated) 
-                && ArchipelagoClient.state == ArchipelagoClient.State.Menu)
-            {
                 GUI.Label(new Rect(16, 36, 150, 20), "Host: ");
                 GUI.Label(new Rect(16, 56, 150, 20), "PlayerName: ");
                 GUI.Label(new Rect(16, 76, 150, 20), "Password: ");
