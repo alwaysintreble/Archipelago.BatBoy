@@ -21,9 +21,9 @@ If you have not received this ability yet it will be impossible to clear but you
 so I won't be fixing this.
 
 # How do I generate my randomized game?
-In order to generate a randomized game for Bat Boy you must download the most recent [`.apworld` release here](), and place it in an Archipelago 0.3.5 or newer
+In order to generate a randomized game for Bat Boy you must download the most recent [`.apworld` release here](/releases), and place it in an Archipelago 0.3.5 or newer
 release in the `worlds` folder. The default path for this is `C:\ProgramData\Archipelago\worlds` so you should have `C:\ProgramData\Archipelago\worlds\batboy.apworld`.
-You can then download the [default YAML template](), modify it in a text editor to select your options, place it in the `Archipelago/Players` folder and run
+You can then download the [default YAML template](/releases), modify it in a text editor to select your options, place it in the `Archipelago/Players` folder and run
 `ArchipelagoGenerate.exe` to generate your randomized game. This will output a zip folder in `Archipelago/output`. From there you can either upload this resulting
 zip to the [Archipelago website](https://archipelago.gg/), or run `ArchipelagoMultiServer.exe` and select the resulting zip.
 
