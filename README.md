@@ -19,6 +19,8 @@ the demo's 3 levels, as well as the seeds and first hp upgrade in Helsia's shop.
 If you have not received this ability yet it will be impossible to clear but you can exit by just selecting quit from the pause menu.
 * If you select quit multiple times from the pause menu while in a level the game will crash. This is a vanilla bug
 so I won't be fixing this.
+* I have not managed to find the location of the Windy Forest Green Seed and as such it is not a valid randomized location. Will add it once somebody tells me
+where it is or I'm able to find it. Possible it doesn't exist in the demo but seems unlikely.
 
 # How do I generate my randomized game?
 In order to generate a randomized game for Bat Boy you must download the most recent [`.apworld` release here](/releases), and place it in an Archipelago 0.3.5 or newer
