@@ -93,10 +93,13 @@ namespace Archipelago.BatBoy
                                ArchipelagoClient.APVersion[1] + "." + ArchipelagoClient.APVersion[2];
             if (ArchipelagoClient.Authenticated)
             {
+                Cursor.visible = false;
                 GUI.Label(new Rect(16, 16, 300, 20), apVersion + " Status: Connected");
             }
             else // show we aren't connected and a text box allowing the info to be entered
             {
+                Cursor.visible = true;
+                
                 GUI.Label(new Rect(16, 16, 300, 20), apVersion + " Status: Not Connected");
                 GUI.Label(new Rect(16, 36, 150, 20), "Host: ");
                 GUI.Label(new Rect(16, 56, 150, 20), "PlayerName: ");
