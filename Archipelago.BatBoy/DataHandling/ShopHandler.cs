@@ -21,11 +21,15 @@ public class ShopHandler
     // TODO all of the shop code will probably need a rewrite when game releases as i had to do a lot of hardcoding
     public void OnTransaction(On.UIShop.orig_CommitTransaction orig, UIShop self)
     {
-        var (purchaseItem, itemIndex) = this.GetCurrentShopItem(self);
-        if (TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()) && 
-            purchaseItem.ShopItemType != ShopItem.ShopItemTypes.GoldenSeed)
+        var (purchaseItem, itemIndex) = GetCurrentShopItem(self);
+        if (TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()))
         {
-            if ((ShopSlots)itemIndex != ShopSlots.Slot1)
+            if (StageManager.Instance.IsPlatformingStage)
+            {
+                Level level = (Level)StageManager.Instance.LevelIndex;
+                ArchipelagoItemsController.SendLocationCheck(level, LocationType.GoldenSeed);
+            }
+            else if ((ShopSlots)itemIndex != ShopSlots.Slot1)
             {
                 // TODO somehow check which shop this is here
                 if (!_consumablesBought.Contains(Shop.RedSeedShop))
