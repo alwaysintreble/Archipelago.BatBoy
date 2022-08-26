@@ -40,6 +40,7 @@ namespace Archipelago.BatBoy
             On.SaveManager.Save += ArchipelagoClient.ServerData.SaveAPInfo;
             On.TitleScreen.Exit += OnGameClose;
             // On.PlayerController.PlayerDie // lmao they made this so easy
+            On.Collectable.Collect += ArchipelagoItemsController.OnCollect;
 
         }
 
@@ -52,21 +53,24 @@ namespace Archipelago.BatBoy
 
         private void OnGameStart(On.TitleScreen.orig_StartGame orig, TitleScreen self, int number)
         {
-            if (SaveManager.Savegame.Slots[number].Health != 0)
-            {
-                ArchipelagoClient.ServerData.LoadAPInfo(number);
-                LocationsAndItemsHelper.SendAsyncChecks();
-            }
-
+            // game only starts if we're connected to a server first
             if (ArchipelagoClient.Authenticated)
             {
                 orig(self, number);
                 saveSlot = SaveManager.Savegame.GetCurrentSlot();
                 APLog.LogInfo("Save loaded successfully");
             }
-            else
+            else if (SaveManager.Savegame.Slots[number].Health != 0)
             {
+                ArchipelagoClient.ServerData.LoadAPInfo(number);
+                APLog.LogInfo("Loading save...");
                 ArchipelagoClient.Connect();
+                if (ArchipelagoClient.Authenticated)
+                {
+                    orig(self, number);
+                    // APLog.LogInfo("Sending checks...");
+                    // LocationsAndItemsHelper.SendAsyncChecks(); // can't figure out why this doesn't work
+                }
             }
         }
 
