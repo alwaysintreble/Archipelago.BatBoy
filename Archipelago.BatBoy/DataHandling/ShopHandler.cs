@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Archipelago.BatBoy.ServerCommunication;
 using HarmonyLib;
@@ -10,7 +11,12 @@ public class ShopHandler
 {
     private readonly FieldInfo _shopItemsInfo;
     private readonly FieldInfo _selectedItemInfo;
-    private readonly List<Shop> _consumablesBought = new();
+    private List<Shop> _consumablesBought = new();
+
+    private Dictionary<Shop, List<ShopSlots>> _slotsBoughtPerShop = new()
+    {
+        { Shop.RedSeedShop, new List<ShopSlots>() },
+    };
 
     public ShopHandler()
     {
@@ -21,31 +27,79 @@ public class ShopHandler
     // TODO all of the shop code will probably need a rewrite when game releases as i had to do a lot of hardcoding
     public void OnTransaction(On.UIShop.orig_CommitTransaction orig, UIShop self)
     {
-        var (purchaseItem, itemIndex) = this.GetCurrentShopItem(self);
-        if (TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()) && 
-            purchaseItem.ShopItemType != ShopItem.ShopItemTypes.GoldenSeed)
+        var purchaseItem = GetCurrentShopItem(self);
+        if (TransactionIsDone(purchaseItem, SaveManager.Savegame.GetCurrentSlot()))
         {
-            if ((ShopSlots)itemIndex != ShopSlots.Slot1)
+            if (StageManager.Instance.IsPlatformingStage)
             {
-                // TODO somehow check which shop this is here
-                if (!_consumablesBought.Contains(Shop.RedSeedShop))
-                {
-                    _consumablesBought.Add(Shop.RedSeedShop);
-                    ArchipelagoItemsController.SendShopLocation(purchaseItem);
-                    LocationsAndItemsHelper.CheckLocation((ShopSlots)itemIndex);
-                }
+                Level level = (Level)StageManager.Instance.LevelIndex;
+                ArchipelagoItemsController.SendLocationCheck(level, LocationType.GoldenSeed);
             }
             else
             {
-                ArchipelagoItemsController.SendShopLocation(purchaseItem);
-                LocationsAndItemsHelper.CheckLocation((ShopSlots)itemIndex);
+                BatBoySlot saveSlot = SaveManager.Savegame.GetCurrentSlot();
+                ShopSlots itemIndex = ShopSlots.Slot1;
+                switch (purchaseItem.ShopItemType)
+                {
+                    case ShopItem.ShopItemTypes.RedSeed:
+                        --saveSlot.RedSeeds;
+                        foreach (ShopSlots slot in Enum.GetValues(typeof(ShopSlots)))
+                        {
+                            if (!ArchipelagoClient.ServerData.ShopSlotsChecked.Contains(slot))
+                            {
+                                itemIndex = slot;
+                                break;
+                            }
+                        }
+                        LocationsAndItemsHelper.CheckLocation(itemIndex);
+                        break;
+                    case ShopItem.ShopItemTypes.GreenSeed:
+                        --saveSlot.GreenSeeds;
+                        foreach (ShopSlots slot in Enum.GetValues(typeof(ShopSlots)))
+                        {
+                            if (!ArchipelagoClient.ServerData.ShopSlotsChecked.Contains(slot))
+                            {
+                                itemIndex = slot;
+                                break;
+                            }
+                        }
+                        _slotsBoughtPerShop[Shop.RedSeedShop].Add(itemIndex);
+                        LocationsAndItemsHelper.CheckLocation(itemIndex);
+                        break;
+                    case ShopItem.ShopItemTypes.GoldenSeed:
+                        --saveSlot.GoldenSeeds;
+                        foreach (ShopSlots slot in Enum.GetValues(typeof(ShopSlots)))
+                        {
+                            if (!ArchipelagoClient.ServerData.ShopSlotsChecked.Contains(slot))
+                            {
+                                itemIndex = slot;
+                                break;
+                            }
+                        }
+                        _slotsBoughtPerShop[Shop.RedSeedShop].Add(itemIndex);
+                        LocationsAndItemsHelper.CheckLocation(itemIndex);
+                        break;
+                    case ShopItem.ShopItemTypes.IncreaseHP:
+                        if (!ArchipelagoClient.ServerData.ShopSlotsChecked.Contains(ShopSlots.Consumable))
+                        {
+                            --saveSlot.Health;
+                            LocationsAndItemsHelper.CheckLocation(ShopSlots.Consumable);
+                        }
+                        break;
+                    case ShopItem.ShopItemTypes.IncreaseStamina:
+                        --saveSlot.Stamina;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                APLog.LogInfo($"{purchaseItem.ShopItemType} in shop purchased");
             }
         }
 
         orig(self);
     }
 
-    private Tuple<ShopItem, int> GetCurrentShopItem(UIShop currentShop)
+    private ShopItem GetCurrentShopItem(UIShop currentShop)
     {
         ShopItem[] shopItems = _shopItemsInfo.GetValue(currentShop) as ShopItem[];
         int selectedItemIndex = (int)_selectedItemInfo.GetValue(currentShop);
@@ -55,7 +109,7 @@ public class ShopHandler
         }
         ShopItem shopItem = shopItems[selectedItemIndex];
 
-        return new Tuple<ShopItem, int>(shopItem, selectedItemIndex);
+        return shopItem;
     }
 
     private static bool TransactionIsDone(ShopItem currentItem, BatBoySlot saveSlot)

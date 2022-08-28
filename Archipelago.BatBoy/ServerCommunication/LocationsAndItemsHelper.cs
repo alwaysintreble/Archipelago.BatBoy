@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Archipelago.MultiClient.Net.Packets;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Archipelago.BatBoy.ServerCommunication;
 
@@ -71,31 +73,42 @@ public static class LocationsAndItemsHelper
     public static void SendAsyncChecks()
     {
         BatBoySlot saveSlot = SaveManager.Savegame.GetCurrentSlot();
-        foreach (int i in Enum.GetValues(typeof(Level)))
+        foreach (Level i in Enum.GetValues(typeof(Level)))
         {
             foreach (LocationType j in Enum.GetValues(typeof(LocationType)))
             {
-                if (ArchipelagoClient.ServerData.Checked.Contains(LevelLocationsLookup[new LevelLocation((Level)i, j)])) 
+                if (ArchipelagoClient.ServerData.Checked.Contains(LevelLocationsLookup[new LevelLocation((Level)i, j)]))
+                {
+                    APLog.LogInfo($"{i} {j} already found");
                     continue;
-                Level currentLevel = (Level)i + 1;
+                }
+                
+                APLog.LogInfo(i);
+                APLog.LogInfo($"{i} {j}");
                 switch (j)
                 {
                     case LocationType.RedSeed:
-                        if(saveSlot.RedSeedCollectedLevels.Contains(i))
-                            CheckLocation(currentLevel, j);
+                        if(saveSlot.RedSeedCollectedLevels.Contains((int)i))
+                            CheckLocation(i, j);
                         break;
                     case LocationType.GreenSeed:
-                        if (saveSlot.GreenSeedCollectedLevels.Contains(i))
-                            CheckLocation(currentLevel, j);
+                        if (saveSlot.GreenSeedCollectedLevels.Contains((int)i))
+                            CheckLocation(i, j);
                         break;
                     case LocationType.GoldenSeed:
-                        if (saveSlot.GoldenSeedCollectedLevels.Contains(i))
-                            CheckLocation(currentLevel, j);
+                        if (saveSlot.GoldenSeedCollectedLevels.Contains((int)i))
+                            CheckLocation(i, j);
                         break;
                     case LocationType.LevelClear:
-                        if (saveSlot.LevelsClear.Contains(i))
-                            CheckLocation(currentLevel, j);
+                        if (saveSlot.LevelsClear.Contains((int)i))
+                            CheckLocation(i, j);
                         break;
+                    case LocationType.Casette:
+                        if (saveSlot.CasetteCollectedLevels.Contains((int)i))
+                            CheckLocation(i, j);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
@@ -131,6 +144,7 @@ public static class LocationsAndItemsHelper
                 break;
         }
         APLog.LogInfo($"Received {unlockItem}!");
+        SaveManager.Save();
     }
 
     public static void Unlock(Ability unlockAbility)
@@ -145,14 +159,14 @@ public static class LocationsAndItemsHelper
     public static void CheckLocation(Level level, LocationType locationType)
     {
         long checkID = LevelLocationsLookup[new LevelLocation(level, locationType)];
+        APLog.LogInfo($"Sending {level} {locationType}");
         ArchipelagoClient.Session.Locations.CompleteLocationChecks(checkID);
         ArchipelagoClient.ServerData.Checked.Add(checkID);
     }
 
     public static void CheckLocation(ShopSlots slot)
     {
-        while (ArchipelagoClient.ServerData.ShopSlotsChecked.Contains(slot))
-            ++slot;
+        APLog.LogInfo($"Sending {slot}");
         ArchipelagoClient.ServerData.ShopSlotsChecked.Add(slot);
         long checkID = ShopLocationsLookup[slot];
         ArchipelagoClient.Session.Locations.CompleteLocationChecks(checkID);
