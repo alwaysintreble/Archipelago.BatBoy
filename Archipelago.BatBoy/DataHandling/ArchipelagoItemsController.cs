@@ -102,32 +102,6 @@ public class ArchipelagoItemsController
         APLog.LogInfo($"{locationType} for {currentLevel} found!");
     }
 
-    public static void SendShopLocation(ShopItem shopItem)
-    {
-        BatBoySlot saveSlot = SaveManager.Savegame.GetCurrentSlot();
-        switch (shopItem.ShopItemType)
-        {
-            case ShopItem.ShopItemTypes.RedSeed:
-                --saveSlot.RedSeeds;
-                break;
-            case ShopItem.ShopItemTypes.GreenSeed:
-                --saveSlot.GreenSeeds;
-                break;
-            case ShopItem.ShopItemTypes.GoldenSeed:
-                --saveSlot.GoldenSeeds;
-                break;
-            case ShopItem.ShopItemTypes.IncreaseHP:
-                --saveSlot.Health;
-                break;
-            case ShopItem.ShopItemTypes.IncreaseStamina:
-                --saveSlot.Stamina;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-        APLog.LogInfo($"{shopItem.ShopItemType} in shop purchased");
-    }
-
     private void GetCorrectAbilities(BatBoySlot saveSlot)
     {
         #if DEBUG

@@ -166,10 +166,7 @@ public static class LocationsAndItemsHelper
 
     public static void CheckLocation(ShopSlots slot)
     {
-        APLog.LogInfo(slot);
-        while (ArchipelagoClient.ServerData.ShopSlotsChecked.Contains(slot))
-            ++slot;
-        APLog.LogInfo(slot);
+        APLog.LogInfo($"Sending {slot}");
         ArchipelagoClient.ServerData.ShopSlotsChecked.Add(slot);
         long checkID = ShopLocationsLookup[slot];
         ArchipelagoClient.Session.Locations.CompleteLocationChecks(checkID);
