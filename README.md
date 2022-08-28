@@ -46,5 +46,3 @@ If you are running the `Multiserver` locally, this is `localhost`; if you're con
    - If this occurs, your login information is stored along with the save slot, so you can simply reload the save file.
 * No console exists.
    - To see items received and sent, or to hint, you must connect to your slot with an Archipelago Text Client.
-* The mouse cursor doesn't draw over the screen, so it can be difficult to click on the connection box.
-   - The elements will highlight when you mouse over them, but there is no fix for this yet.
