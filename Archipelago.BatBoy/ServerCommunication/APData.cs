@@ -15,6 +15,7 @@ public class APData
     public HashSet<long> @Checked = new();
     public List<Ability> AcquiredAbilities = new();
     public List<ShopSlots> ShopSlotsChecked = new();
+    public bool DeathLink = false;
     
     private readonly string _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
         @"..\Bat Boy Demo\BepInEx\plugins\Archipelago\saves\"); // TODO this will need to change when game releases
@@ -41,6 +42,7 @@ public class APData
                     Checked = tempData.Checked;
                     AcquiredAbilities = tempData.AcquiredAbilities;
                     ShopSlotsChecked = tempData.ShopSlotsChecked;
+                    DeathLink = tempData.DeathLink;
                     
                     if (ArchipelagoClient.Connect() && ArchipelagoClient.ServerData.Checked != null)
                         ArchipelagoClient.Session.Locations.CompleteLocationChecks(ArchipelagoClient.ServerData.Checked

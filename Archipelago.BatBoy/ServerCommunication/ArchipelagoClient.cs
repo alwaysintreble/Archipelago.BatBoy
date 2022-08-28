@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
@@ -21,6 +20,7 @@ public static class ArchipelagoClient
     public static bool Authenticated;
 
     public static ArchipelagoSession Session;
+    public static DeathLinkInterface DeathLinkService;
 
     public static bool Connect()
     {
@@ -50,11 +50,20 @@ public static class ArchipelagoClient
             null,
             "",
             ServerData.Password == "" ? null : ServerData.Password);
-
+        
+        APLog.LogInfo(loginResult);
         if (loginResult is LoginSuccessful loginSuccess)
         {
+            APLog.LogInfo("Authenticating...");
             Authenticated = true;
-            // if (loginSuccess.SlotData.ContainsKey()){}
+            if (loginSuccess.SlotData.TryGetValue("deathlink", out var deathLink))
+            {
+                ServerData.DeathLink = (bool)deathLink;
+                APLog.LogInfo("Death Link status from server:");
+                APLog.LogInfo(ServerData.DeathLink);
+            }
+            APLog.LogInfo("Setting up death link...");
+            DeathLinkService = new DeathLinkInterface();
         }
         else if (loginResult is LoginFailure loginFailure)
         {
@@ -96,7 +105,6 @@ public static class ArchipelagoClient
                 {
                     var p = packet as PrintPacket;
                     MessageQueue.Add(p.Text);
-                    APLog.LogInfo(p.Text);
                 }
 
                 break;
@@ -130,7 +138,6 @@ public static class ArchipelagoClient
                     }
 
                     MessageQueue.Add(text);
-                    APLog.LogInfo(text);
                 }
 
                 break;
