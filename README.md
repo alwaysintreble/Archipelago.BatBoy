@@ -3,6 +3,7 @@
 This is a mod for the currently unreleased [Bat Boy](https://store.steampowered.com/app/1709350/Bat_Boy/) demo that connects it to the
 [Archipelago architecture](https://github.com/ArchipelagoMW/Archipelago). Currently, this only works as a fully remote mod, meaning that a server must host the data for the
 randomized game, whether playing a seed by yourself or with other people.
+This works using the [BepInEx library](https://github.com/BepInEx/BepInEx), the [MonoMod HookGen Patcher](https://github.com/harbingerofme/Bepinex.Monomod.HookGenPatcher), and the [Archipelago MultiClient.Net library](https://github.com/ArchipelagoMW/Archipelago.MultiClient.Net) so huge thanks to everyone who created these tools.
 
 # What's Archipelago?
 Archipelago is a multi-game, multiworld randomizer. It allows games like this to be randomized and played in a multiworld with all other
@@ -28,8 +29,7 @@ In order to generate the randomized seed you will require the config/yaml file i
 adds the game information to the archipelago generator, server, and clients.
 
 # How do I generate my randomized game?
-In order to generate a randomized game for Bat Boy, you must download the most recent `.apworld`, and place it in an Archipelago 0.3.5 or newer release in the `worlds`
-folder. The default path for this is `C:\ProgramData\Archipelago\worlds`, so you should have `C:\ProgramData\Archipelago\worlds\batboy.apworld`. You can then use the
+In order to generate a randomized game for Bat Boy, you must download the most recent `.apworld`, and place it in an Archipelago 0.3.5 or newer release in the `/lib/worlds` folder. The default path for this is `C:\ProgramData\Archipelago\worlds`, so you should have `C:\ProgramData\Archipelago\worlds\batboy.apworld`. You can then use the
 default YAML template, modify it in a text editor to select your options, place it in the `Archipelago/Players` folder and run `ArchipelagoGenerate.exe` to generate your randomized game.
 This will output a zip folder in `Archipelago/output`. From there, you can either upload this resulting  zip to the [Archipelago website](https://archipelago.gg/),
 or run `ArchipelagoMultiServer.exe` and select the resulting zip. Note that if the game is uploaded to the  website all of your items and locations will show up as "Unknown".
@@ -45,4 +45,4 @@ If you are running the `Multiserver` locally, this is `localhost`; if you're con
 * Disconnecting will crash the game.
    - If this occurs, your login information is stored along with the save slot, so you can simply reload the save file.
 * No console exists.
-   - To see items received and sent, or to hint, you must connect to your slot with an Archipelago Text Client.
+   - To see items received and sent, or to hint, you must connect to your slot with an Archipelago Text Client. This is included with the [main Archipelago install](https://github.com/ArchipelagoMW/Archipelago/releases). Make sure to also download the latest batboy.apworld and place it in the `/lib/worlds` folder.
