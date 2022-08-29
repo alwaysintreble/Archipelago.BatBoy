@@ -1,10 +1,16 @@
-﻿namespace Archipelago.BatBoy;
+﻿namespace Archipelago.BatBoy.Constants;
 
 public enum Level
 {
     GrassyPlains,
     FrozenPeak,
     WindyForest,
+}
+
+public enum CasetteLevel
+{
+    RedSeedShop,
+    GroovyHouse = -1
 }
 
 

@@ -29,8 +29,8 @@ namespace Archipelago.BatBoy
             
             LocationsAndItemsHelper.Init();
             
-            // This only gets called on clearing levels but is the easiest way to handle collecting the seeds and
-            // changing the ability states. Investigate other methods but unlikely.
+            // This only gets called on clearing levels but is the easiest way to handle changing the ability states.
+            // Investigate other methods but unlikely.
             On.BatBoySaveGame.SaveLevelClear += _locationsHandler.SaveLevelClear;
             
             On.UIShop.CommitTransaction += _shopHandler.OnTransaction;
@@ -39,7 +39,7 @@ namespace Archipelago.BatBoy
             On.UIShop.ShowPopup += OnShopPopup;
             On.SaveManager.Save += ArchipelagoClient.ServerData.SaveAPInfo;
             On.TitleScreen.Exit += OnGameClose;
-            // On.PlayerController.PlayerDie // lmao they made this so easy
+            On.PlayerController.Die += DeathLinkInterface.SendDeathLink;
             On.Collectable.Collect += ArchipelagoItemsController.OnCollect;
 
         }
@@ -85,7 +85,7 @@ namespace Archipelago.BatBoy
         {
             yield return null;
         }
-        
+
         private void OnGUI()
         {
             // Shows whether we're currently connected to the ap server
@@ -119,7 +119,7 @@ namespace Archipelago.BatBoy
             
 #if DEBUG
             // Debug buttons to grant items and abilities :)
-            if (GUI.Button(new Rect(0, 100, 50, 50), "Red Seeds"))
+            if (GUI.Button(new Rect(0, 120, 75, 50), "Red Seeds"))
             {
                 if (saveSlot != null)
                 {
@@ -129,7 +129,7 @@ namespace Archipelago.BatBoy
                 }
             }
 
-            if (GUI.Button(new Rect(50, 100, 50, 50), "Green Seeds"))
+            if (GUI.Button(new Rect(75, 120, 75, 50), "Green Seeds"))
             {
                 if (saveSlot != null)
                 {
@@ -139,7 +139,7 @@ namespace Archipelago.BatBoy
                 }
             }
             
-            if (GUI.Button(new Rect(100, 100, 50, 50), "Golden Seeds"))
+            if (GUI.Button(new Rect(150, 120, 75, 50), "Golden Seeds"))
             {
                 if (saveSlot != null)
                 {
@@ -149,7 +149,7 @@ namespace Archipelago.BatBoy
                 }
             }
 
-            if (GUI.Button(new Rect(150, 100, 50, 50), "100 Crystals"))
+            if (GUI.Button(new Rect(225, 120, 75, 50), "100 Crystals"))
             {
                 if (saveSlot != null)
                 {
@@ -159,7 +159,7 @@ namespace Archipelago.BatBoy
                 }
             }
 
-            if (GUI.Button(new Rect(200, 100, 50, 50), "Bat Spin"))
+            if (GUI.Button(new Rect(0, 170, 75, 50), "Bat Spin"))
             {
                 if (saveSlot != null)
                 {
@@ -169,7 +169,7 @@ namespace Archipelago.BatBoy
                 }
             }
 
-            if (GUI.Button(new Rect(250, 100, 50, 50), "Slash Bash"))
+            if (GUI.Button(new Rect(75, 170, 75, 50), "Slash Bash"))
             {
                 if (saveSlot != null)
                 {
@@ -179,7 +179,7 @@ namespace Archipelago.BatBoy
                 }
             }
 
-            if (GUI.Button(new Rect(300, 100, 50, 50), "Grappling Ribbon"))
+            if (GUI.Button(new Rect(150, 170, 75, 50), "Grappling Ribbon"))
             {
                 if (saveSlot != null)
                 {
@@ -189,11 +189,71 @@ namespace Archipelago.BatBoy
                 }
             }
 
-            if (GUI.Button(new Rect(350, 110, 50, 50), "He Dead"))
+            if (GUI.Button(new Rect(225, 170, 75, 50), "He Dead"))
             {
                 if (saveSlot != null)
                 {
-                    //send deathlink function
+                    PlayerController.Die();
+                }
+            }
+            
+            if (GUI.Button(new Rect(0, 220, 75, 50), "Bubble Shield"))
+            {
+                if (saveSlot != null)
+                {
+                    saveSlot.HasBubbleShield = true;
+                    SaveManager.Save();
+                    APLog.LogInfo($"Cheated Bubble Shield");
+                }
+            }
+            
+            if (GUI.Button(new Rect(75, 220, 75, 50), "Bull Rush"))
+            {
+                if (saveSlot != null)
+                {
+                    saveSlot.HasBullRush = true;
+                    SaveManager.Save();
+                    APLog.LogInfo($"Cheated Bull Rush");
+                }
+            }
+            
+            if (GUI.Button(new Rect(150,220, 75, 50), "Wall Jump"))
+            {
+                if (saveSlot != null)
+                {
+                    saveSlot.HasWallJump = true;
+                    SaveManager.Save();
+                    APLog.LogInfo($"Cheated Wall Jump");
+                }
+            }
+            
+            if (GUI.Button(new Rect(225, 220, 75, 50), "Bouncing Basket"))
+            {
+                if (saveSlot != null)
+                {
+                    saveSlot.HasBouncingBasket = true;
+                    SaveManager.Save();
+                    APLog.LogInfo($"Cheated Bouncing Basket");
+                }
+            }
+            
+            if (GUI.Button(new Rect(0, 270, 75, 50), "Mega Smash"))
+            {
+                if (saveSlot != null)
+                {
+                    saveSlot.HasMegaSmash = true;
+                    SaveManager.Save();
+                    APLog.LogInfo($"Cheated Mega Smash");
+                }
+            }
+            
+            if (GUI.Button(new Rect(75, 270, 75, 50), "Ace Stomp"))
+            {
+                if (saveSlot != null)
+                {
+                    saveSlot.HasAceStomp = true;
+                    SaveManager.Save();
+                    APLog.LogInfo($"Cheated Ace Stomp");
                 }
             }
 #endif

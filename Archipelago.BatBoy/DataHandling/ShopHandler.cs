@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Archipelago.BatBoy.Constants;
 using Archipelago.BatBoy.ServerCommunication;
 using HarmonyLib;
 
@@ -32,7 +33,7 @@ public class ShopHandler
         {
             if (StageManager.Instance.IsPlatformingStage)
             {
-                Level level = (Level)StageManager.Instance.LevelIndex;
+                Level level = (Level)(StageManager.Instance.LevelIndex - 1);
                 ArchipelagoItemsController.SendLocationCheck(level, LocationType.GoldenSeed);
             }
             else
@@ -51,7 +52,7 @@ public class ShopHandler
                                 break;
                             }
                         }
-                        LocationsAndItemsHelper.CheckLocation(itemIndex);
+                        LocationsAndItemsHelper.CheckLocation((Level)StageManager.Instance.LevelIndex, itemIndex);
                         break;
                     case ShopItem.ShopItemTypes.GreenSeed:
                         --saveSlot.GreenSeeds;
@@ -64,26 +65,16 @@ public class ShopHandler
                             }
                         }
                         _slotsBoughtPerShop[Shop.RedSeedShop].Add(itemIndex);
-                        LocationsAndItemsHelper.CheckLocation(itemIndex);
+                        LocationsAndItemsHelper.CheckLocation((Level)StageManager.Instance.LevelIndex, itemIndex);
                         break;
                     case ShopItem.ShopItemTypes.GoldenSeed:
                         --saveSlot.GoldenSeeds;
-                        foreach (ShopSlots slot in Enum.GetValues(typeof(ShopSlots)))
-                        {
-                            if (!ArchipelagoClient.ServerData.ShopSlotsChecked.Contains(slot))
-                            {
-                                itemIndex = slot;
-                                break;
-                            }
-                        }
-                        _slotsBoughtPerShop[Shop.RedSeedShop].Add(itemIndex);
-                        LocationsAndItemsHelper.CheckLocation(itemIndex);
                         break;
                     case ShopItem.ShopItemTypes.IncreaseHP:
                         if (!ArchipelagoClient.ServerData.ShopSlotsChecked.Contains(ShopSlots.Consumable))
                         {
                             --saveSlot.Health;
-                            LocationsAndItemsHelper.CheckLocation(ShopSlots.Consumable);
+                            LocationsAndItemsHelper.CheckLocation((Level)StageManager.Instance.LevelIndex, ShopSlots.Consumable);
                         }
                         break;
                     case ShopItem.ShopItemTypes.IncreaseStamina:
