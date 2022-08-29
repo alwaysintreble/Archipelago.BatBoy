@@ -26,12 +26,14 @@ public static class LocationsAndItemsHelper
     public static readonly Dictionary<long, Item> ItemsLookup = new();
     public static readonly Dictionary<long, Ability> AbilitiesLookup = new();
     public static readonly Dictionary<LevelLocation, long> LevelLocationsLookup = new();
+    public static readonly Dictionary<CasetteLevel, long> CasetteLocationsLookup = new();
     public static readonly Dictionary<ShopSlots, long> ShopLocationsLookup = new();
     
     public static void Init()
     {
         const long baseCodeOffset = 696969;
         const long abilityCodeOffset = 20;
+        const long casetteOffset = 100;
         const long shopCodeOffset = 200;
 
         // add items and abilities to item lookup dictionary
@@ -107,7 +109,7 @@ public static class LocationsAndItemsHelper
         foreach (ShopSlots i in ArchipelagoClient.ServerData.ShopSlotsChecked)
         {
             if (!ArchipelagoClient.ServerData.Checked.Contains(ShopLocationsLookup[i]))
-                CheckLocation(i);
+                CheckLocation((Level)StageManager.Instance.LevelIndex, i);
         }
     }
     
@@ -157,7 +159,15 @@ public static class LocationsAndItemsHelper
         SaveManager.Save();
     }
 
-    public static void CheckLocation(ShopSlots slot)
+    public static void CheckLocation(CasetteLevel casetteLevel)
+    {
+        APLog.LogInfo($"Sending {casetteLevel} casette");
+        long checkID = CasetteLocationsLookup[casetteLevel];
+        ArchipelagoClient.Session.Locations.CompleteLocationChecks(checkID);
+        ArchipelagoClient.ServerData.Checked.Add(checkID);
+    }
+
+    public static void CheckLocation(Level shop, ShopSlots slot)
     {
         APLog.LogInfo($"Sending {slot}");
         ArchipelagoClient.ServerData.ShopSlotsChecked.Add(slot);

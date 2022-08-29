@@ -14,6 +14,8 @@ public class ArchipelagoItemsController
 
         BatBoySlot saveSlot = SaveManager.Savegame.GetCurrentSlot();
         int levelIndex = StageManager.Instance.LevelIndex;
+        if (StageManager.Instance.IsPlatformingStage)
+            --levelIndex;
 
         List<Collectable.CollectableType> sendableItems = new()
         {
@@ -40,7 +42,10 @@ public class ArchipelagoItemsController
                     SendLocationCheck((Level)levelIndex, LocationType.GoldenSeed);
                     break;
                 case Collectable.CollectableType.Casette:
-                    SendLocationCheck((Level)levelIndex, LocationType.Casette);
+                    if (StageManager.Instance.IsPlatformingStage)
+                        SendLocationCheck((Level)levelIndex, LocationType.Casette);
+                    else
+                        SendLocationCheck((CasetteLevel) levelIndex);
                     break;
             }
         }
@@ -54,30 +59,15 @@ public class ArchipelagoItemsController
         if (!saveSlot.LevelsClear.Contains(levelIndex))
         {
             saveGame.Slots[saveGame.CurrentSlot].LevelsClear.Add(levelIndex);
-            SendLocationCheck((Level)levelIndex, LocationType.LevelClear);
+            SendLocationCheck((Level)levelIndex-1, LocationType.LevelClear);
         }
 
-        if (StageManager.Instance.CollectedRedSeed &&
-            !saveSlot.RedSeedCollectedLevels.Contains(levelIndex))
-        {
+        if (!saveSlot.RedSeedCollectedLevels.Contains(levelIndex) && StageManager.Instance.CollectedRedSeed)
             saveSlot.RedSeedCollectedLevels.Add(levelIndex);
-            SendLocationCheck((Level)levelIndex, LocationType.RedSeed);
-        }
-
-        if (StageManager.Instance.CollectedGreenSeed &&
-            !saveSlot.GreenSeedCollectedLevels.Contains(levelIndex))
-        {
+        if (!saveSlot.GreenSeedCollectedLevels.Contains(levelIndex) && StageManager.Instance.CollectedGreenSeed)
             saveSlot.GreenSeedCollectedLevels.Add(levelIndex);
-            SendLocationCheck((Level)levelIndex, LocationType.GreenSeed);
-            
-        }
-        
-        if (StageManager.Instance.CollectedGoldenSeed &&
-            !saveSlot.GoldenSeedCollectedLevels.Contains(levelIndex))
-        {
+        if (!saveSlot.GoldenSeedCollectedLevels.Contains(levelIndex) && StageManager.Instance.CollectedGoldenSeed)
             saveSlot.GoldenSeedCollectedLevels.Add(levelIndex);
-            SendLocationCheck((Level)levelIndex, LocationType.GoldenSeed);
-        }
 
         if (StageManager.Instance.CollectedCasette &&
             !saveSlot.CasetteCollectedLevels.Contains(levelIndex))
@@ -88,7 +78,7 @@ public class ArchipelagoItemsController
             saveSlot.CasetteCollectedLevels.Add(levelIndex);
         }
         
-        GetCorrectAbilities(saveGame.GetCurrentSlot());
+        GetCorrectAbilities(saveSlot);
         
         saveSlot.Crystals += StageManager.Instance.CollectedCrystals;
         if (saveSlot.Crystals > 999)
@@ -98,9 +88,14 @@ public class ArchipelagoItemsController
     
     public static void SendLocationCheck(Level currentLevel, LocationType locationType)
     {
-        --currentLevel;
         LocationsAndItemsHelper.CheckLocation(currentLevel, locationType);
         APLog.LogInfo($"{locationType} for {currentLevel} found!");
+    }
+
+    public static void SendLocationCheck(CasetteLevel currentLevel)
+    {
+        LocationsAndItemsHelper.CheckLocation(currentLevel);
+        APLog.LogInfo($"{LocationType.Casette} for {currentLevel} found!");
     }
 
     private void GetCorrectAbilities(BatBoySlot saveSlot)
