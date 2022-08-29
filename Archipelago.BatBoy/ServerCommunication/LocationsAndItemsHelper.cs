@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Archipelago.BatBoy.Constants;
 using Archipelago.MultiClient.Net.Packets;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -35,29 +36,20 @@ public static class LocationsAndItemsHelper
 
         // add items and abilities to item lookup dictionary
         foreach (Item i in Enum.GetValues(typeof(Item)))
-        {
             ItemsLookup[baseCodeOffset + (int)i] = i;
-        }
         foreach (Ability i in Enum.GetValues(typeof(Ability)))
-        {
             AbilitiesLookup[baseCodeOffset + abilityCodeOffset + (int)i] = i;
-        }
-        
+
         // add locations and shops to location lookup dictionary
         foreach (Level i in Enum.GetValues(typeof(Level)))
-        {
             foreach (LocationType j in Enum.GetValues(typeof(LocationType)))
-            {
-                LevelLocationsLookup[new LevelLocation(i, j)] =
-                    baseCodeOffset + (int)i * 5 + (int)j;
-            }
-        }
-        // only one shop so pseudo hard coding this for now
-        foreach (ShopSlots i in Enum.GetValues(typeof(ShopSlots)))
-        {
+                LevelLocationsLookup[new LevelLocation(i, j)] = baseCodeOffset + (int)i * 5 + (int)j;
+        foreach (CasetteLevel i in Enum.GetValues(typeof(CasetteLevel)))
+            CasetteLocationsLookup[i] = baseCodeOffset + casetteOffset + Math.Abs((int)i);
+            // only one shop so pseudo hard coding this for now
+        foreach (ShopSlots i in Enum.GetValues(typeof(ShopSlots))) 
             ShopLocationsLookup[i] = baseCodeOffset + shopCodeOffset + (int)i;
-        }
-        
+
 #if DEBUG
         APLog.LogInfo("Items Lookup:");
         ItemsLookup.Select(i => $"{i.Key}: {i.Value}").ToList().ForEach(Console.WriteLine);
@@ -77,7 +69,7 @@ public static class LocationsAndItemsHelper
         {
             foreach (LocationType j in Enum.GetValues(typeof(LocationType)))
             {
-                if (ArchipelagoClient.ServerData.Checked.Contains(LevelLocationsLookup[new LevelLocation((Level)i, j)]))
+                if (ArchipelagoClient.ServerData.Checked.Contains(LevelLocationsLookup[new LevelLocation(i, j)]))
                 {
                     APLog.LogInfo($"{i} {j} already found");
                     continue;
@@ -162,6 +154,7 @@ public static class LocationsAndItemsHelper
         APLog.LogInfo($"Sending {level} {locationType}");
         ArchipelagoClient.Session.Locations.CompleteLocationChecks(checkID);
         ArchipelagoClient.ServerData.Checked.Add(checkID);
+        SaveManager.Save();
     }
 
     public static void CheckLocation(ShopSlots slot)

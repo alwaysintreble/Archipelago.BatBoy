@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Archipelago.BatBoy.Constants;
 using Archipelago.BatBoy.ServerCommunication;
 
 namespace Archipelago.BatBoy.DataHandling;

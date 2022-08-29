@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Archipelago.BatBoy.Constants;
 using Newtonsoft.Json;
 
 namespace Archipelago.BatBoy.ServerCommunication;
