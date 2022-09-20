@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Archipelago.BatBoy;
+namespace Archipelago.BatBoy.Constants;
 
 public static class AbilityMap
 {
