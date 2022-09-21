@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Reflection;
 using Archipelago.BatBoy.DataHandling;
 
 using BepInEx;
@@ -6,6 +7,7 @@ using UnityEngine;
 
 using Archipelago.BatBoy.ServerCommunication;
 using Archipelago.BatBoy.Constants;
+using HarmonyLib;
 
 namespace Archipelago.BatBoy
 {
@@ -22,6 +24,8 @@ namespace Archipelago.BatBoy
         private readonly ShopHandler _shopHandler = new();
 
         public BatBoySlot saveSlot;
+
+        private FieldInfo _highlightedSlot;
 
         private void Awake()
         {
@@ -52,23 +56,25 @@ namespace Archipelago.BatBoy
         }
 
 
-        private void OnGameStart(On.TitleScreen.orig_StartGame orig, TitleScreen self, int number)
+        private void OnGameStart(On.TitleScreen.orig_StartGame orig, TitleScreen self)
         {
+            _highlightedSlot = AccessTools.Field(typeof(TitleScreen), "hightlightedSlot");
+            var slotNumber = (int)_highlightedSlot.GetValue(self);
+            saveSlot = SaveManager.Savegame.Slots[slotNumber];
             // game only starts if we're connected to a server first
             if (ArchipelagoClient.Authenticated)
             {
-                orig(self, number);
-                saveSlot = SaveManager.Savegame.GetCurrentSlot();
+                orig(self);
                 APLog.LogInfo("Save loaded successfully");
             }
-            else if (SaveManager.Savegame.Slots[number].Health != 0)
+            else if (SaveManager.Savegame.Slots[slotNumber].Health != 0)
             {
-                ArchipelagoClient.ServerData.LoadAPInfo(number);
+                ArchipelagoClient.ServerData.LoadAPInfo(slotNumber);
                 APLog.LogInfo("Loading save...");
                 ArchipelagoClient.Connect();
                 if (ArchipelagoClient.Authenticated)
                 {
-                    orig(self, number);
+                    orig(self);
                     // APLog.LogInfo("Sending checks...");
                     // LocationsAndItemsHelper.SendAsyncChecks(); // can't figure out why this doesn't work
                 }
