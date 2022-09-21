@@ -22,7 +22,7 @@ public class ArchipelagoItemsController
             Collectable.CollectableType.RedSeed,
             Collectable.CollectableType.GreenSeed,
             Collectable.CollectableType.GoldenSeed,
-            Collectable.CollectableType.Casette,
+            Collectable.CollectableType.Cassette,
         };
 
         if (sendableItems.Contains(self.type))
@@ -41,11 +41,11 @@ public class ArchipelagoItemsController
                     saveSlot.GoldenSeedCollectedLevels.Add(levelIndex);
                     SendLocationCheck((Level)levelIndex, LocationType.GoldenSeed);
                     break;
-                case Collectable.CollectableType.Casette:
+                case Collectable.CollectableType.Cassette:
                     if (StageManager.Instance.IsPlatformingStage)
-                        SendLocationCheck((Level)levelIndex, LocationType.Casette);
+                        SendLocationCheck((Level)levelIndex, LocationType.Cassette);
                     else
-                        SendLocationCheck((CasetteLevel) levelIndex);
+                        SendLocationCheck((CassetteLevel) levelIndex);
                     break;
             }
         }
@@ -92,10 +92,10 @@ public class ArchipelagoItemsController
         APLog.LogInfo($"{locationType} for {currentLevel} found!");
     }
 
-    public static void SendLocationCheck(CasetteLevel currentLevel)
+    public static void SendLocationCheck(CassetteLevel currentLevel)
     {
         LocationsAndItemsHelper.CheckLocation(currentLevel);
-        APLog.LogInfo($"{LocationType.Casette} for {currentLevel} found!");
+        APLog.LogInfo($"{LocationType.Cassette} for {currentLevel} found!");
     }
 
     private void GetCorrectAbilities(BatBoySlot saveSlot)

@@ -45,9 +45,8 @@ public class APData
                     ShopSlotsChecked = tempData.ShopSlotsChecked;
                     DeathLink = tempData.DeathLink;
                     
-                    if (ArchipelagoClient.Connect() && ArchipelagoClient.ServerData.Checked != null)
-                        ArchipelagoClient.Session.Locations.CompleteLocationChecks(ArchipelagoClient.ServerData.Checked
-                            .ToArray());
+                    if (ArchipelagoClient.Connect() && Checked != null)
+                        ArchipelagoClient.Session.Locations.CompleteLocationChecks(Checked.ToArray());
                 }
             }
         }

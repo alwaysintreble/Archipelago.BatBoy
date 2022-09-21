@@ -26,14 +26,14 @@ public static class LocationsAndItemsHelper
     public static readonly Dictionary<long, Item> ItemsLookup = new();
     public static readonly Dictionary<long, Ability> AbilitiesLookup = new();
     public static readonly Dictionary<LevelLocation, long> LevelLocationsLookup = new();
-    public static readonly Dictionary<CasetteLevel, long> CasetteLocationsLookup = new();
+    public static readonly Dictionary<CassetteLevel, long> CassetteLocationsLookup = new();
     public static readonly Dictionary<ShopSlots, long> ShopLocationsLookup = new();
     
     public static void Init()
     {
         const long baseCodeOffset = 696969;
         const long abilityCodeOffset = 20;
-        const long casetteOffset = 100;
+        const long cassetteOffset = 100;
         const long shopCodeOffset = 200;
 
         // add items and abilities to item lookup dictionary
@@ -46,8 +46,8 @@ public static class LocationsAndItemsHelper
         foreach (Level i in Enum.GetValues(typeof(Level)))
             foreach (LocationType j in Enum.GetValues(typeof(LocationType)))
                 LevelLocationsLookup[new LevelLocation(i, j)] = baseCodeOffset + (int)i * 5 + (int)j;
-        foreach (CasetteLevel i in Enum.GetValues(typeof(CasetteLevel)))
-            CasetteLocationsLookup[i] = baseCodeOffset + casetteOffset + Math.Abs((int)i);
+        foreach (CassetteLevel i in Enum.GetValues(typeof(CassetteLevel)))
+            CassetteLocationsLookup[i] = baseCodeOffset + cassetteOffset + Math.Abs((int)i);
             // only one shop so pseudo hard coding this for now
         foreach (ShopSlots i in Enum.GetValues(typeof(ShopSlots))) 
             ShopLocationsLookup[i] = baseCodeOffset + shopCodeOffset + (int)i;
@@ -97,7 +97,7 @@ public static class LocationsAndItemsHelper
                         if (saveSlot.LevelsClear.Contains((int)i))
                             CheckLocation(i, j);
                         break;
-                    case LocationType.Casette:
+                    case LocationType.Cassette:
                         if (saveSlot.CasetteCollectedLevels.Contains((int)i))
                             CheckLocation(i, j);
                         break;
@@ -128,7 +128,7 @@ public static class LocationsAndItemsHelper
             case Item.GoldenSeed:
                 ++saveSlot.GoldenSeeds;
                 break;
-            case Item.Casette:
+            case Item.Cassette:
                 break;
             case Item.Health:
                 ++saveSlot.Health;
@@ -159,10 +159,10 @@ public static class LocationsAndItemsHelper
         SaveManager.Save();
     }
 
-    public static void CheckLocation(CasetteLevel casetteLevel)
+    public static void CheckLocation(CassetteLevel cassetteLevel)
     {
-        APLog.LogInfo($"Sending {casetteLevel} casette");
-        long checkID = CasetteLocationsLookup[casetteLevel];
+        APLog.LogInfo($"Sending {cassetteLevel} casette");
+        long checkID = CassetteLocationsLookup[cassetteLevel];
         ArchipelagoClient.Session.Locations.CompleteLocationChecks(checkID);
         ArchipelagoClient.ServerData.Checked.Add(checkID);
     }

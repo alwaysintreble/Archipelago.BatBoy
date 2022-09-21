@@ -7,7 +7,7 @@ public enum Level
     WindyForest,
 }
 
-public enum CasetteLevel
+public enum CassetteLevel
 {
     RedSeedShop,
     GroovyHouse = -1
@@ -19,7 +19,7 @@ public enum LocationType
     RedSeed,
     GreenSeed,
     GoldenSeed,
-    Casette,
+    Cassette,
     LevelClear,
 }
 

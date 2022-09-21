@@ -1,11 +1,11 @@
-﻿namespace Archipelago.BatBoy;
+﻿namespace Archipelago.BatBoy.Constants;
 
 public enum Item
 {
     RedSeed,
     GreenSeed,
     GoldenSeed,
-    Casette,
+    Cassette,
     Health,
     Stamina,
 }
