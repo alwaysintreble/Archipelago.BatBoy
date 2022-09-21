@@ -17,7 +17,7 @@ namespace Archipelago.BatBoy
         public const string PluginGUID = "com.alwaysintreble.Archipelago.BatBoy";
         public const string PluginAuthor = "alwaysintreble";
         public const string PluginName = "Archipelago";
-        public const string PluginVersion = "0.1.5";
+        public const string PluginVersion = "0.1.6";
         
         
         private readonly ArchipelagoItemsController _locationsHandler = new();
